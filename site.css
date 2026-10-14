@@ -3671,3 +3671,108 @@ table {
 .flex{
   display: flex;
 }
+
+/* =============================================
+   ブロック崩しゲーム（Neon Breakout）スタイル
+   ============================================= */
+
+/* ゲームセクション全体 */
+#area-game {
+  padding: 60px 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 10, 30, 0.6) 50%, transparent 100%);
+}
+
+/* HUD（スコア・レベル・ライフ表示） */
+#breakout-hud {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 12px;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: #888;
+}
+
+#breakout-hud b {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 0 8px #00e5ff;
+}
+
+/* キャンバス外側のラッパー（オーバーレイの基準） */
+#breakout-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0; /* 余白除去 */
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+/* ゲームキャンバス本体 */
+#breakoutCanvas {
+  display: block;
+  border: 2px solid rgba(0, 229, 255, 0.4);
+  border-radius: 8px;
+  box-shadow:
+    0 0 20px rgba(0, 229, 255, 0.3),
+    0 0 60px rgba(0, 229, 255, 0.1);
+  cursor: none;
+  max-width: 100%;
+}
+
+/* スタート・ゲームオーバーのオーバーレイ */
+#bo-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 8px;
+  gap: 18px;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+#bo-overlay h2 {
+  color: #fff;
+  font-size: 2.2rem;
+  font-family: 'Segoe UI', sans-serif;
+  text-shadow: 0 0 20px #00e5ff, 0 0 40px #00e5ff;
+  letter-spacing: 0.15em;
+  margin: 0;
+}
+
+#bo-overlay p {
+  color: #aaa;
+  font-size: 0.95rem;
+  margin: 0;
+  text-align: center;
+}
+
+/* スタートボタン */
+#bo-start-btn {
+  padding: 12px 36px;
+  background: linear-gradient(135deg, #00e5ff, #7b2fff);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+}
+
+#bo-start-btn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 0 35px rgba(0, 229, 255, 0.85);
+}
+
+#bo-start-btn:active {
+  transform: scale(0.96);
+}

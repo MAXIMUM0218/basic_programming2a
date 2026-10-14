@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>Neon Breakout</title>
+  <meta name="description" content="ネオンブロック崩しゲーム">
+  <!-- スマホ対応：スケーリング禁止でゲームを正確に操作できるようにする -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    /* ===== 全体リセット ===== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ダーク背景 */
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #050510;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      font-family: 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+      /* スマホでのスクロール中の誤タッチ防止 */
+      touch-action: manipulation;
+    }
+
+    /* 背景グラデーションアクセント */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(120, 40, 200, 0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 200, 255, 0.08) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== ゲーム全体コンテナ ===== */
+    #game-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 8px 24px;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    /* タイトル */
+    h1 {
+      color: #fff;
+      font-size: clamp(1.2rem, 5vw, 1.8rem);
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-shadow:
+        0 0 8px #00e5ff,
+        0 0 25px #00e5ff;
+    }
+
+    /* ===== HUD（スコア・レベル・ライフ） ===== */
+    #breakout-hud {
+      display: flex;
+      gap: clamp(16px, 5vw, 36px);
+      color: #888;
+      font-size: clamp(0.75rem, 3vw, 0.95rem);
+      letter-spacing: 0.08em;
+    }
+
+    #breakout-hud b {
+      color: #fff;
+      font-weight: 700;
+      text-shadow: 0 0 8px #00e5ff;
+    }
+
+    /* ===== キャンバスラッパー ===== */
+    #breakout-wrap {
+      position: relative;
+      width: 100%;
+      /* アスペクト比 480:560 を維持 */
+      max-width: 480px;
+    }
+
+    /* キャンバス本体：幅100%でレスポンシブ対応 */
+    #breakoutCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 2px solid rgba(0, 229, 255, 0.4);
+      border-radius: 8px;
+      box-shadow:
+        0 0 20px rgba(0, 229, 255, 0.3),
+        0 0 60px rgba(0, 229, 255, 0.1);
+      /* スマホでのタッチ操作中にページスクロールさせない */
+      touch-action: none;
+    }
+
+    /* ===== オーバーレイ（スタート・ゲームオーバー） ===== */
+    #bo-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.78);
+      border-radius: 8px;
+      gap: 14px;
+      backdrop-filter: blur(5px);
+      z-index: 10;
+      padding: 20px;
+    }
+
+    #bo-overlay-title {
+      color: #fff;
+      font-size: clamp(1.5rem, 7vw, 2.2rem);
+      text-shadow: 0 0 18px #00e5ff, 0 0 40px #00e5ff;
+      letter-spacing: 0.15em;
+      margin: 0;
+      text-align: center;
+    }
+
+    #bo-overlay-msg {
+      color: #bbb;
+      font-size: clamp(0.8rem, 3.5vw, 0.95rem);
+      margin: 0;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* 賞品表示（ゲームオーバー後） */
+    #bo-prize {
+      font-size: clamp(1rem, 4.5vw, 1.3rem);
+      font-weight: 700;
+      text-align: center;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: none; /* ゲームオーバー時のみ表示 */
+    }
+
+    /* スタートボタン */
+    #bo-start-btn {
+      padding: 12px 36px;
+      background: linear-gradient(135deg, #00e5ff, #7b2fff);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: clamp(0.9rem, 3.5vw, 1rem);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+      /* スマホでタップしやすいサイズ */
+      min-width: 140px;
+      min-height: 44px;
+    }
+
+    #bo-start-btn:hover {
+      transform: scale(1.07);
+      box-shadow: 0 0 35px rgba(0, 229, 255, 0.85);
+    }
+
+    #bo-start-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* ===== 操作ヒント ===== */
+    #hint {
+      color: #444;
+      font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+
+    /* ===== スマホ用仮想パドルコントロール ===== */
+    #touch-controls {
+      display: none; /* JS でタッチデバイス時のみ表示 */
+      gap: 16px;
+      width: 100%;
+      max-width: 480px;
+      justify-content: space-between;
+    }
+
+    .touch-btn {
+      flex: 1;
+      height: 56px;
+      background: rgba(0, 229, 255, 0.1);
+      border: 2px solid rgba(0, 229, 255, 0.35);
+      border-radius: 12px;
+      color: #00e5ff;
+      font-size: 1.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .touch-btn:active {
+      background: rgba(0, 229, 255, 0.25);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game-container">
+    <!-- タイトル -->
+    <h1>⚡ Neon Breakout</h1>
+
+    <!-- HUD -->
+    <div id="breakout-hud">
+      <span>SCORE: <b id="bo-score">0</b></span>
+      <span>LEVEL: <b id="bo-level">1</b></span>
+      <span>LIVES: <b id="bo-lives">❤️❤️❤️</b></span>
+    </div>
+
+    <!-- キャンバス + オーバーレイ -->
+    <div id="breakout-wrap">
+      <canvas id="breakoutCanvas" width="480" height="560"></canvas>
+
+      <div id="bo-overlay">
+        <h2 id="bo-overlay-title">NEON BREAKOUT</h2>
+        <p id="bo-overlay-msg">
+          【PC】マウスでパドルを操作<br>
+          【スマホ】画面をスワイプ or 左右ボタン<br>
+          スペースキーで一時停止
+        </p>
+        <!-- ゲームオーバー時のみ表示する賞品バナー -->
+        <div id="bo-prize"></div>
+        <button id="bo-start-btn">▶ PLAY</button>
+      </div>
+    </div>
+
+    <!-- 操作ヒント -->
+    <p id="hint">PC：マウス移動 | スマホ：スワイプ / ボタン | スペース：一時停止</p>
+
+    <!-- スマホ用左右ボタン（タッチデバイスのみ表示） -->
+    <div id="touch-controls">
+      <div class="touch-btn" id="btn-left">◀</div>
+      <div class="touch-btn" id="btn-right">▶</div>
+    </div>
+  </div>
+
+  <!-- ゲームロジック（12.js に記述） -->
+  <script src="12.js" defer></script>
+</body>
+
+</html>
