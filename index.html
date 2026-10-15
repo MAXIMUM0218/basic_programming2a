@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>脳トレ：Touch the Numbers</title>
+    <title>脳トレ：Touch the Numbers タイムアタック</title>
     <style>
         /* 全体のスタイリング */
         body {
@@ -45,7 +45,7 @@
             font-family: monospace;
             font-weight: bold;
             color: #0f172a;
-            margin: 15px 0;
+            margin: 10px 0;
             letter-spacing: 2px;
         }
 
@@ -60,7 +60,7 @@
         /* 数字ボタンのスタイリング */
         .number-btn {
             width: 100%;
-            aspect-ratio: 1; /* 正方形にする */
+            aspect-ratio: 1; 
             font-size: 1.4rem;
             font-weight: bold;
             background-color: #e2e8f0;
@@ -72,25 +72,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            user-select: none; /* テキスト選択を防ぐ */
+            user-select: none;
         }
 
-        /* 押した瞬間のフィードバック */
         .number-btn:active {
             transform: scale(0.92);
             background-color: #cbd5e1;
         }
 
-        /* 正解したボタンの状態 */
         .number-btn.clicked {
             background-color: #3b82f6;
             color: white;
             cursor: default;
-            transform: scale(1); /* クリック後は動かさない */
+            transform: scale(1);
             opacity: 0.8;
         }
 
-        /* 不正解時（ミス）のアニメーション */
         .number-btn.error {
             background-color: #ef4444;
             color: white;
@@ -109,6 +106,7 @@
             cursor: pointer;
             transition: background-color 0.2s;
             width: 100%;
+            margin-top: 10px;
         }
 
         #start-btn:hover {
@@ -122,12 +120,27 @@
 
         /* メッセージ表示エリア */
         #message {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            color: #f59e0b;
+            color: #333;
             min-height: 1.5em;
-            margin-bottom: 10px;
         }
+
+        /* クーポン結果表示エリア */
+        #coupon {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding: 15px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* クーポンのランク別装飾 */
+        .coupon-gold { background-color: #fef08a; color: #854d0e; border: 2px dashed #eab308; }
+        .coupon-silver { background-color: #f1f5f9; color: #334155; border: 2px dashed #94a3b8; }
+        .coupon-bronze { background-color: #ffedd5; color: #9a3412; border: 2px dashed #f97316; }
+        .coupon-none { background-color: #f3f4f6; color: #6b7280; font-size: 0.95rem; }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -140,11 +153,16 @@
 
     <div id="game-container">
         <h1>Touch the Numbers</h1>
-        <p class="description">1から25までの数字を順番に素早くタップ！</p>
+        <p class="description">
+            15秒以内：学食30%割引<br>
+            20秒以内：売店30円引き / 25秒以内：売店10円引き
+        </p>
         
         <div id="message"></div>
         <div id="timer">0.000</div>
         
+        <div id="coupon" class="hidden"></div>
+
         <div id="board" class="hidden"></div>
         
         <button id="start-btn">スタート</button>
@@ -155,59 +173,53 @@
         const startBtn = document.getElementById('start-btn');
         const timerDisplay = document.getElementById('timer');
         const messageDisplay = document.getElementById('message');
+        const couponDisplay = document.getElementById('coupon');
 
         let currentTarget = 1;
         let startTime = 0;
         let timerInterval = null;
         let isPlaying = false;
 
-        // スタートボタンのクリックイベント
         startBtn.addEventListener('click', startGame);
 
         function startGame() {
-            // 初期化
             currentTarget = 1;
             messageDisplay.textContent = " ";
             timerDisplay.textContent = "0.000";
             
-            // UIの切り替え
+            // クーポン表示をリセットして隠す
+            couponDisplay.classList.add('hidden');
+            couponDisplay.className = 'hidden'; // クラスの初期化
+            
             startBtn.classList.add('hidden');
             board.classList.remove('hidden');
 
-            // 盤面の生成
             createBoard();
 
-            // 計測開始
             startTime = Date.now();
             isPlaying = true;
             
             if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimer, 10); // 10msごとに更新
+            timerInterval = setInterval(updateTimer, 10);
         }
 
         function createBoard() {
-            board.innerHTML = ""; // 盤面をクリア
-            
-            // 1〜25の配列を作成
+            board.innerHTML = ""; 
             let numbers = Array.from({length: 25}, (_, i) => i + 1);
             
-            // Fisher-Yatesアルゴリズムで配列をシャッフル
             for (let i = numbers.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
             }
 
-            // ボタンを生成して盤面に追加
             numbers.forEach(num => {
                 const btn = document.createElement('button');
                 btn.className = 'number-btn';
                 btn.textContent = num;
                 
-                // タッチ（またはクリック）イベントの設定
-                // touchstartを使うとスマホでタップ時の遅延が無くなります
                 const interactEvent = ('ontouchstart' in window) ? 'touchstart' : 'mousedown';
                 btn.addEventListener(interactEvent, (e) => {
-                    e.preventDefault(); // ダブルタップズームなどを防止
+                    e.preventDefault(); 
                     handleNumberClick(btn, num);
                 });
                 
@@ -219,16 +231,13 @@
             if (!isPlaying || btn.classList.contains('clicked')) return;
 
             if (num === currentTarget) {
-                // 正解の処理
                 btn.classList.add('clicked');
                 currentTarget++;
 
-                // 25まで押し終わったか判定
                 if (currentTarget > 25) {
                     endGame();
                 }
             } else {
-                // 不正解の処理（エラーアニメーションを付与）
                 btn.classList.add('error');
                 setTimeout(() => btn.classList.remove('error'), 300);
             }
@@ -236,7 +245,6 @@
 
         function updateTimer() {
             const elapsedTime = (Date.now() - startTime) / 1000;
-            // 少数第3位まで表示
             timerDisplay.textContent = elapsedTime.toFixed(3);
         }
 
@@ -246,9 +254,30 @@
             
             const finalTime = (Date.now() - startTime) / 1000;
             timerDisplay.textContent = finalTime.toFixed(3);
-            messageDisplay.textContent = "クリア！ 🎉";
             
-            // もう一度遊べるようにスタートボタンを復活させる
+            // 盤面を隠して結果を見やすくする
+            board.classList.add('hidden');
+            couponDisplay.classList.remove('hidden');
+
+            // タイムに応じたクーポンの判定と表示
+            if (finalTime <= 15.0) {
+                messageDisplay.textContent = "驚異的なスピード！ 🎉";
+                couponDisplay.textContent = "🎁 【学食orバン30%割引券】獲得！";
+                couponDisplay.classList.add('coupon-gold');
+            } else if (finalTime <= 20.0) {
+                messageDisplay.textContent = "素晴らしいタイム！ 👏";
+                couponDisplay.textContent = "🎁 【売店30円引き】獲得！";
+                couponDisplay.classList.add('coupon-silver');
+            } else if (finalTime <= 25.0) {
+                messageDisplay.textContent = "クリア！お見事！ 👍";
+                couponDisplay.textContent = "🎁 【売店10円引き】獲得！";
+                couponDisplay.classList.add('coupon-bronze');
+            } else {
+                messageDisplay.textContent = "クリア！次はもっと早く！ 🏃";
+                couponDisplay.textContent = "今回は割引なし（25秒以内でクーポン獲得）";
+                couponDisplay.classList.add('coupon-none');
+            }
+            
             setTimeout(() => {
                 startBtn.textContent = "もう一度プレイ";
                 startBtn.classList.remove('hidden');
