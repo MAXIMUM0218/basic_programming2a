@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脳トレ：Touch the Numbers</title>
+    <style>
+        /* 全体のスタイリング */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        #game-container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #1e293b;
+        }
+
+        p.description {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        /* タイム表示 */
+        #timer {
+            font-size: 2.5rem;
+            font-family: monospace;
+            font-weight: bold;
+            color: #0f172a;
+            margin: 15px 0;
+            letter-spacing: 2px;
+        }
+
+        /* 5x5のグリッドレイアウト */
+        #board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* 数字ボタンのスタイリング */
+        .number-btn {
+            width: 100%;
+            aspect-ratio: 1; /* 正方形にする */
+            font-size: 1.4rem;
+            font-weight: bold;
+            background-color: #e2e8f0;
+            color: #334155;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none; /* テキスト選択を防ぐ */
+        }
+
+        /* 押した瞬間のフィードバック */
+        .number-btn:active {
+            transform: scale(0.92);
+            background-color: #cbd5e1;
+        }
+
+        /* 正解したボタンの状態 */
+        .number-btn.clicked {
+            background-color: #3b82f6;
+            color: white;
+            cursor: default;
+            transform: scale(1); /* クリック後は動かさない */
+            opacity: 0.8;
+        }
+
+        /* 不正解時（ミス）のアニメーション */
+        .number-btn.error {
+            background-color: #ef4444;
+            color: white;
+            animation: shake 0.3s;
+        }
+
+        /* スタートボタン */
+        #start-btn {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        #start-btn:hover {
+            background-color: #059669;
+        }
+
+        /* 表示切り替え用クラス */
+        .hidden {
+            display: none !important;
+        }
+
+        /* メッセージ表示エリア */
+        #message {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f59e0b;
+            min-height: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h1>Touch the Numbers</h1>
+        <p class="description">1から25までの数字を順番に素早くタップ！</p>
+        
+        <div id="message"></div>
+        <div id="timer">0.000</div>
+        
+        <div id="board" class="hidden"></div>
+        
+        <button id="start-btn">スタート</button>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const startBtn = document.getElementById('start-btn');
+        const timerDisplay = document.getElementById('timer');
+        const messageDisplay = document.getElementById('message');
+
+        let currentTarget = 1;
+        let startTime = 0;
+        let timerInterval = null;
+        let isPlaying = false;
+
+        // スタートボタンのクリックイベント
+        startBtn.addEventListener('click', startGame);
+
+        function startGame() {
+            // 初期化
+            currentTarget = 1;
+            messageDisplay.textContent = " ";
+            timerDisplay.textContent = "0.000";
+            
+            // UIの切り替え
+            startBtn.classList.add('hidden');
+            board.classList.remove('hidden');
+
+            // 盤面の生成
+            createBoard();
+
+            // 計測開始
+            startTime = Date.now();
+            isPlaying = true;
+            
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 10); // 10msごとに更新
+        }
+
+        function createBoard() {
+            board.innerHTML = ""; // 盤面をクリア
+            
+            // 1〜25の配列を作成
+            let numbers = Array.from({length: 25}, (_, i) => i + 1);
+            
+            // Fisher-Yatesアルゴリズムで配列をシャッフル
+            for (let i = numbers.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+            }
+
+            // ボタンを生成して盤面に追加
+            numbers.forEach(num => {
+                const btn = document.createElement('button');
+                btn.className = 'number-btn';
+                btn.textContent = num;
+                
+                // タッチ（またはクリック）イベントの設定
+                // touchstartを使うとスマホでタップ時の遅延が無くなります
+                const interactEvent = ('ontouchstart' in window) ? 'touchstart' : 'mousedown';
+                btn.addEventListener(interactEvent, (e) => {
+                    e.preventDefault(); // ダブルタップズームなどを防止
+                    handleNumberClick(btn, num);
+                });
+                
+                board.appendChild(btn);
+            });
+        }
+
+        function handleNumberClick(btn, num) {
+            if (!isPlaying || btn.classList.contains('clicked')) return;
+
+            if (num === currentTarget) {
+                // 正解の処理
+                btn.classList.add('clicked');
+                currentTarget++;
+
+                // 25まで押し終わったか判定
+                if (currentTarget > 25) {
+                    endGame();
+                }
+            } else {
+                // 不正解の処理（エラーアニメーションを付与）
+                btn.classList.add('error');
+                setTimeout(() => btn.classList.remove('error'), 300);
+            }
+        }
+
+        function updateTimer() {
+            const elapsedTime = (Date.now() - startTime) / 1000;
+            // 少数第3位まで表示
+            timerDisplay.textContent = elapsedTime.toFixed(3);
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            
+            const finalTime = (Date.now() - startTime) / 1000;
+            timerDisplay.textContent = finalTime.toFixed(3);
+            messageDisplay.textContent = "クリア！ 🎉";
+            
+            // もう一度遊べるようにスタートボタンを復活させる
+            setTimeout(() => {
+                startBtn.textContent = "もう一度プレイ";
+                startBtn.classList.remove('hidden');
+            }, 500);
+        }
+    </script>
+</body>
+</html>
