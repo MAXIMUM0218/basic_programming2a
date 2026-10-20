@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分散乗車ガイド - ブルーライン</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // 緑を基調としたフラットなカラーパレット
+                        greenline: '#2e7d32',     // ヘッダー・メインテキスト用 (深緑)
+                        greenmid: '#4caf50',      // 空き号車のハイライト用 (鮮やかな緑)
+                        greenlinedark: '#1b5e20', // ボタンホバー用
+                        greenbg: '#e8f5e9'        // バッジ背景用 (薄い緑)
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center min-h-screen text-gray-800">
+
+    <!-- モバイルアプリ用コンテナ -->
+    <div class="w-full max-w-[400px] bg-white min-h-screen relative flex flex-col border-x border-gray-200 shadow-sm">
+        
+        <!-- ヘッダー (フラットデザイン) -->
+        <header class="bg-greenline text-white p-4 flex items-center justify-between">
+            <h1 class="text-base font-bold tracking-wide">分散乗車ガイド</h1>
+            <span class="text-xs bg-white text-greenline font-bold px-3 py-1 rounded-sm">中川駅</span>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="p-5 flex-1 flex flex-col gap-6">
+            
+            <!-- ミッション説明カード -->
+            <section class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-greenline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h2 class="text-sm font-bold text-gray-800">ミッション</h2>
+                </div>
+                <p class="text-sm text-gray-600 leading-relaxed">
+                    空いている号車に移動してQRコードを読み込むと、ミニゲームの<span class="text-greenline font-bold">スコア倍率が2倍</span>になります。（通常は1倍）
+                </p>
+            </section>
+
+            <!-- 電車ビジュアル (シンプルな矩形) -->
+            <section>
+                <div class="flex justify-between items-end mb-3">
+                    <h2 class="text-sm font-bold text-gray-800">ターゲット号車</h2>
+                    <span id="target-number-text" class="text-lg font-bold text-greenmid">-号車</span>
+                </div>
+                
+                <!-- 6両編成コンテナ -->
+                <div class="flex gap-1 h-20 items-end border-b-2 border-gray-200 pb-1" id="train-container">
+                    <!-- JSで動的に車両を生成 -->
+                </div>
+                
+                <div class="flex justify-between mt-2 text-[10px] text-gray-400 font-medium">
+                    <span>← 湘南台方面</span>
+                    <span>あざみ野方面 →</span>
+                </div>
+            </section>
+
+            <!-- アクションボタン -->
+            <section class="mt-2">
+                <button id="verify-btn" class="w-full bg-greenline text-white font-bold py-4 rounded-lg transition-colors hover:bg-greenlinedark flex justify-center items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    QRコードを読み込む (模擬)
+                </button>
+                <p class="text-[11px] text-gray-400 text-center mt-3">※ホームのQRコードを読み取ります</p>
+            </section>
+
+            <!-- ミニゲームセクション -->
+            <section id="minigame-container" class="relative border border-gray-200 bg-white rounded-lg overflow-hidden mt-auto transition-colors duration-300">
+                
+                <!-- コンテンツ -->
+                <div class="p-6 text-center">
+                    <h3 class="font-bold text-gray-800 mb-2">待ち時間ミニゲーム</h3>
+                    <div class="mb-5">
+                        <span id="multiplier-badge" class="text-xs text-gray-600 font-bold bg-gray-100 px-3 py-1.5 rounded-sm border border-gray-200 transition-colors duration-300">
+                            現在のスコア倍率: 1倍
+                        </span>
+                    </div>
+                    <button id="play-game-btn" class="w-full bg-gray-800 text-white font-bold py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                        ミニゲームで遊ぶ
+                    </button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const trainContainer = document.getElementById('train-container');
+            const targetText = document.getElementById('target-number-text');
+            const verifyBtn = document.getElementById('verify-btn');
+            const minigameContainer = document.getElementById('minigame-container');
+            const multiplierBadge = document.getElementById('multiplier-badge');
+            const playGameBtn = document.getElementById('play-game-btn');
+            
+            let scoreMultiplier = 1; // 初期倍率
+
+            // 1. ターゲット号車をランダム決定 (0~5 = 1~6号車)
+            const targetCarIndex = Math.floor(Math.random() * 6);
+            targetText.innerText = `${targetCarIndex + 1}号車`;
+
+            // 2. フラットデザインの電車UI描画
+            trainContainer.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const isTarget = i === targetCarIndex;
+                
+                // ターゲットは明確な緑色（greenmid）に、少し高くする。他はグレー。
+                const bgClass = isTarget ? 'bg-greenmid text-white' : 'bg-gray-200 text-gray-400';
+                const heightClass = isTarget ? 'h-full' : 'h-3/4';
+                const labelHtml = isTarget ? `<span class="text-[10px] mt-1 font-normal opacity-90">空き</span>` : '';
+
+                const carHtml = `
+                    <div class="flex-1 rounded-t-sm flex flex-col items-center justify-center transition-all ${bgClass} ${heightClass}">
+                        <span class="font-bold text-sm leading-none">${i + 1}</span>
+                        ${labelHtml}
+                    </div>
+                `;
+                trainContainer.innerHTML += carHtml;
+            }
+
+            // 3. アクションボタンのイベント処理
+            verifyBtn.addEventListener('click', () => {
+                if (scoreMultiplier === 2) return; // 既に完了している場合は何もしない
+
+                // ローディング（確認中）状態
+                verifyBtn.disabled = true;
+                verifyBtn.classList.remove('bg-greenline', 'hover:bg-greenlinedark');
+                verifyBtn.classList.add('bg-greenline/50', 'cursor-not-allowed');
+                verifyBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    確認中...
+                `;
+
+                // 疑似的な通信待機 (1.5秒)
+                setTimeout(() => {
+                    // ボタンを完了状態に更新
+                    verifyBtn.classList.remove('bg-greenline/50', 'cursor-not-allowed');
+                    verifyBtn.classList.add('bg-gray-800'); // 完了時は黒系で落ち着かせる
+                    verifyBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        証明完了
+                    `;
+
+                    // 倍率の更新
+                    scoreMultiplier = 2;
+                    
+                    // 倍率バッジのUI更新
+                    multiplierBadge.innerText = '現在のスコア倍率: 2倍';
+                    multiplierBadge.classList.remove('text-gray-600', 'bg-gray-100', 'border-gray-200');
+                    multiplierBadge.classList.add('text-greenline', 'bg-greenbg', 'border-greenmid/30');
+
+                    // コンテナの枠線を緑にして強調
+                    minigameContainer.classList.remove('border-gray-200');
+                    minigameContainer.classList.add('border-greenline');
+
+                }, 1500);
+            });
+
+            // 4. ミニゲームプレイボタンのイベント処理
+            playGameBtn.addEventListener('click', () => {
+                // 指定のURLへ遷移（クエリパラメータに現在の倍率を付与）
+                window.location.href = "https://maximum0218.github.io/basic_programming2a/";
+            });
+        });
+    </script>
+</body>
+</html>
