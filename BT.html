@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脳トレ早押しクイズ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        greenline: '#2e7d32',     // メイン・濃い緑
+                        greenmid: '#4caf50',      // アクセント・鮮やかな緑
+                        greenbg: '#e8f5e9',       // 背景・薄い緑
+                        graybg: '#f9fafb'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* 画面切り替え用クラス */
+        .screen {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+        /* プログレスバーのアニメーション用 */
+        #timer-bar {
+            transition: width 0.05s linear, background-color 0.3s;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center min-h-screen text-gray-800">
+
+    <!-- モバイルアプリ用コンテナ -->
+    <div class="w-full max-w-[400px] bg-white min-h-screen relative flex flex-col border-x border-gray-200 shadow-sm overflow-x-hidden">
+        
+        <!-- ヘッダー -->
+        <header class="bg-greenline text-white p-4 flex items-center justify-between z-10 shadow-sm shrink-0">
+            <h1 class="text-base font-bold tracking-wide">脳トレクイズ</h1>
+            <span id="multiplier-badge" class="text-xs bg-white text-greenline font-bold px-3 py-1 rounded-sm hidden shadow-sm">
+                スコア2倍中
+            </span>
+        </header>
+
+        <!-- 1. スタート画面 -->
+        <main id="screen-start" class="screen active flex-1 flex-col items-center justify-center p-6 bg-graybg">
+            <div class="w-20 h-20 bg-greenbg rounded-full flex items-center justify-center mb-6 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-greenline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">早押し脳トレ</h2>
+            <div class="text-sm text-gray-600 text-center mb-8 leading-relaxed">
+                <p class="mb-2">全7問の4択クイズです。</p>
+                <p class="mb-2">問題は<strong class="text-greenline">1文字ずつ表示</strong>され、<br>文節の区切りで<strong class="text-greenline">少し止まります</strong>。</p>
+                <p>1問15秒。早く正解するほど高スコア！<br>スコアランクに応じて報酬がもらえます。</p>
+            </div>
+            <button id="btn-start" class="w-full bg-greenline text-white font-bold py-4 rounded-lg hover:bg-greenline/90 transition-colors shadow-sm">
+                ゲームスタート
+            </button>
+        </main>
+
+        <!-- 2. ゲーム画面 -->
+        <main id="screen-game" class="screen flex-1 flex-col p-5 bg-white relative overflow-y-auto">
+            <!-- ステータスバー -->
+            <div class="flex justify-between items-end mb-2 shrink-0">
+                <span id="q-counter" class="text-sm font-bold text-gray-500">Q. 1 / 7</span>
+                <span class="text-sm font-bold text-greenline">スコア: <span id="current-score">0</span></span>
+            </div>
+            
+            <!-- タイムバー -->
+            <div class="w-full bg-gray-200 h-2 rounded-full mb-4 overflow-hidden shrink-0">
+                <div id="timer-bar" class="h-full bg-greenmid w-full"></div>
+            </div>
+
+            <!-- 問題文エリア -->
+            <div class="bg-greenbg border border-greenmid/30 rounded-lg p-5 min-h-[160px] flex items-start justify-start mb-6 shadow-sm shrink-0">
+                <p id="question-text" class="text-base md:text-lg font-bold text-gray-800 leading-relaxed break-all">
+                    <!-- JSで1文字ずつ追加される -->
+                </p>
+            </div>
+
+            <!-- 選択肢 4択 -->
+            <div id="choices-container" class="grid grid-cols-2 gap-3 mb-4 shrink-0">
+                <!-- JSで生成 -->
+            </div>
+
+            <!-- 解説・結果パネル (初期非表示) -->
+            <div id="explanation-panel" class="hidden flex-col bg-graybg border border-gray-200 rounded-lg p-4 mb-4 shrink-0 shadow-sm transition-opacity duration-300">
+                <div id="judge-title" class="text-xl font-bold text-center mb-2">正解！</div>
+                <div class="text-xs text-gray-500 mb-1 font-bold">解説:</div>
+                <p id="explanation-text" class="text-sm text-gray-700 leading-relaxed mb-4">
+                    ここに解説が入ります。
+                </p>
+                <button id="btn-next" class="w-full bg-greenline text-white font-bold py-3 rounded-lg hover:bg-greenline/90 transition-colors shadow-sm">
+                    次の問題へ
+                </button>
+            </div>
+        </main>
+
+        <!-- 3. リザルト画面 -->
+        <main id="screen-result" class="screen flex-1 flex-col p-6 bg-graybg">
+            <h2 class="text-xl font-bold text-center text-gray-800 mb-6 mt-4">結果発表</h2>
+            
+            <!-- スコア表示 -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm mb-6 relative">
+                <!-- ランクバッジ -->
+                <div id="rank-badge" class="absolute -top-3 -right-3 w-12 h-12 rounded-full bg-yellow-400 text-white font-bold text-xl flex items-center justify-center shadow-md transform rotate-12">
+                    S
+                </div>
+                <p class="text-sm text-gray-500 mb-1">あなたのスコア</p>
+                <div class="text-4xl font-bold text-greenline mb-2"><span id="final-score">0</span> <span class="text-lg">pt</span></div>
+                <p id="bonus-text" class="text-xs text-orange-500 font-bold hidden">分散乗車ボーナス適用 (x2)</p>
+            </div>
+
+            <!-- 報酬表示 -->
+            <div class="bg-white border-2 border-greenmid rounded-lg p-6 text-center shadow-sm mb-auto relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full bg-greenmid text-white text-xs font-bold py-1">獲得報酬</div>
+                <div class="mt-4">
+                    <p id="reward-title" class="text-2xl font-bold text-gray-800">席の予約</p>
+                    <p id="reward-desc" class="text-sm text-gray-600 mt-3 font-medium">おめでとうございます！</p>
+                </div>
+            </div>
+
+            <button id="btn-retry" class="w-full bg-gray-800 text-white font-bold py-4 rounded-lg mt-6 hover:bg-gray-700 transition-colors shadow-sm">
+                トップへ戻る
+            </button>
+        </main>
+    </div>
+
+    <script>
+        // ------------------------------------
+        // クイズのデータ設定 (ハイブリッド・タイプライター用)
+        // ------------------------------------
+        const questions = [
+            {
+                phrases: ["怒りやすい人は", "「これが低い」と", "言われる、", "液体が気体に変わる時の", "温度を", "何というでしょう？"],
+                correct: "沸点",
+                dummies: ["融点", "昇華点", "露点"],
+                explanation: "怒りやすいことを「沸点が低い」と表現します。液体が沸騰して気体になる温度のことです。"
+            },
+            {
+                phrases: ["アメリカ独立100周年を", "記念して", "フランスから贈られた、", "右手には松明、", "左手には銘板を持っている、", "ニューヨークを象徴する", "銅像といえば何でしょう？"],
+                correct: "自由の女神",
+                dummies: ["考える人", "小便小僧", "クリスト・デントール"],
+                explanation: "正式名称は「世界を照らす自由」。アメリカの独立100周年を記念してフランスから贈られました。"
+            },
+            {
+                phrases: ["五島慶太の息子・五島昇が", "スペイン語で", "｢広場」を意味する言葉から", "命名した、", "あざみ野駅と", "鷺沼駅の間に位置する", "田園都市線の駅はどこでしょう？"],
+                correct: "たまプラーザ",
+                dummies: ["青葉台", "市が尾", "宮前平"],
+                explanation: "「プラーザ(plaza)」はスペイン語で広場を意味します。東急田園都市線の主要駅の一つです。"
+            },
+            {
+                phrases: ["ノーベル賞を受賞した", "日本人の中で、", "朝永振一郎や", "江崎玲於奈、", "湯川秀樹が", "受賞したのは", "｢ノーベル何賞｣でしょう？"],
+                correct: "ノーベル物理学賞",
+                dummies: ["ノーベル化学賞", "ノーベル生理学・医学賞", "ノーベル平和賞"],
+                explanation: "湯川秀樹は1949年に日本人として初めてノーベル賞（物理学賞）を受賞しました。"
+            },
+            {
+                phrases: ["漢字では", "｢豪州｣と表記する、", "都市大の留学制度", "｢TAP｣で滞在する国は", "どこでしょう？"],
+                correct: "オーストラリア",
+                dummies: ["アメリカ", "イギリス", "ニュージーランド"],
+                explanation: "TAP（Tokyo City University Australia Program）は、西オーストラリア州のパースに留学するプログラムです。"
+            },
+            {
+                phrases: ["停車駅に", "｢蒔田｣", "｢伊勢佐木長者町駅｣", "｢中川｣などがある、", "横浜市営地下鉄の", "名称は何でしょう？"],
+                correct: "ブルーライン",
+                dummies: ["グリーンライン", "レッドライン", "オレンジライン"],
+                explanation: "あざみ野駅から湘南台駅までを結ぶ横浜市営地下鉄の路線です。"
+            },
+            {
+                phrases: ["妻に", "女優の菅野美穂を持つ、", "主な主演作に", "『半沢直樹』や", "『VIVANT』などがある", "日本の俳優は誰でしょう？"],
+                correct: "堺雅人",
+                dummies: ["阿部寛", "香川照之", "役所広司"],
+                explanation: "数々の大ヒットドラマで主演を務める実力派俳優です。"
+            }
+        ];
+
+        // ------------------------------------
+        // ゲームステート変数
+        // ------------------------------------
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let baseScore = 0; 
+        let multiplier = 1;
+        
+        let globalTimer = null;
+        let questionStartTime = 0;
+        let isAnswering = false;
+        let abortTyping = false; // タイプライター演出の中断フラグ
+
+        const TIME_LIMIT_MS = 15000; // 1問15秒固定
+        const CHAR_DELAY_MS = 50;    // 1文字ごとの間隔
+        const CHUNK_DELAY_MS = 600;  // 文節ごとの間隔
+
+        // ------------------------------------
+        // DOM要素の取得
+        // ------------------------------------
+        const screenStart = document.getElementById('screen-start');
+        const screenGame = document.getElementById('screen-game');
+        const screenResult = document.getElementById('screen-result');
+        const btnStart = document.getElementById('btn-start');
+        const btnRetry = document.getElementById('btn-retry');
+        const btnNext = document.getElementById('btn-next');
+        
+        const qCounter = document.getElementById('q-counter');
+        const currentScoreEl = document.getElementById('current-score');
+        const timerBar = document.getElementById('timer-bar');
+        const questionText = document.getElementById('question-text');
+        const choicesContainer = document.getElementById('choices-container');
+        
+        const explanationPanel = document.getElementById('explanation-panel');
+        const judgeTitle = document.getElementById('judge-title');
+        const explanationText = document.getElementById('explanation-text');
+
+        const finalScoreEl = document.getElementById('final-score');
+        const rankBadge = document.getElementById('rank-badge');
+        const rewardTitle = document.getElementById('reward-title');
+        const rewardDesc = document.getElementById('reward-desc');
+        const bonusText = document.getElementById('bonus-text');
+        const multiplierBadge = document.getElementById('multiplier-badge');
+
+        // ------------------------------------
+        // 初期化処理
+        // ------------------------------------
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('multiplier')) {
+                const parsedMult = parseInt(urlParams.get('multiplier'));
+                if (!isNaN(parsedMult) && parsedMult > 0) {
+                    multiplier = parsedMult;
+                }
+            }
+
+            if (multiplier > 1) {
+                multiplierBadge.classList.remove('hidden');
+            }
+
+            btnStart.addEventListener('click', startGame);
+            btnRetry.addEventListener('click', resetGame);
+            btnNext.addEventListener('click', goNextQuestion);
+        });
+
+        function showScreen(screenEl) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            screenEl.classList.add('active');
+        }
+
+        // ------------------------------------
+        // ゲーム進行ロジック
+        // ------------------------------------
+        function startGame() {
+            // 問題配列をランダムにシャッフル (Fisher-Yates)
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+
+            currentQuestionIndex = 0;
+            score = 0;
+            baseScore = 0;
+            currentScoreEl.innerText = score;
+            showScreen(screenGame);
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswering = false;
+            abortTyping = false;
+            clearInterval(globalTimer);
+            
+            const q = questions[currentQuestionIndex];
+            qCounter.innerText = `Q. ${currentQuestionIndex + 1} / ${questions.length}`;
+            questionText.textContent = "";
+            timerBar.style.width = "100%";
+            timerBar.classList.remove('bg-red-500');
+            timerBar.classList.add('bg-greenmid');
+            
+            explanationPanel.classList.add('hidden');
+            explanationPanel.classList.remove('flex');
+
+            // 選択肢の生成とシャッフル
+            let currentChoices = [q.correct, ...q.dummies];
+            for (let i = currentChoices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentChoices[i], currentChoices[j]] = [currentChoices[j], currentChoices[i]];
+            }
+
+            choicesContainer.innerHTML = '';
+            currentChoices.forEach((choice) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white border-2 border-greenline text-greenline font-bold py-3 px-2 rounded-lg hover:bg-greenbg transition-colors text-sm md:text-base";
+                btn.innerText = choice;
+                btn.onclick = () => handleAnswer(choice, q);
+                choicesContainer.appendChild(btn);
+            });
+
+            questionStartTime = Date.now();
+            
+            // アニメーションとタイマー開始
+            typeQuestionText(q.phrases);
+            globalTimer = setInterval(updateTimer, 50);
+        }
+
+        // ユーティリティ: 待機処理
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ハイブリッド・タイプライター演出 (1文字表示 + チャンク間待機)
+        async function typeQuestionText(phrases) {
+            for (let i = 0; i < phrases.length; i++) {
+                const phrase = phrases[i];
+                
+                // 1文字ずつ追加
+                for (let j = 0; j < phrase.length; j++) {
+                    if (abortTyping) return; // 解答されたら中断
+                    questionText.textContent += phrase[j];
+                    await sleep(CHAR_DELAY_MS);
+                }
+                
+                if (abortTyping) return;
+                
+                // チャンク（文節）の終わりで少し長めの間を設ける（最後のチャンクを除く）
+                if (i < phrases.length - 1) {
+                    await sleep(CHUNK_DELAY_MS);
+                }
+            }
+        }
+
+        // 残りの未表示テキストをグレーで表示する
+        function completeQuestionText(qObject) {
+            const fullText = qObject.phrases.join("");
+            const currentText = questionText.textContent;
+            
+            if (currentText.length < fullText.length) {
+                const remainingText = fullText.substring(currentText.length);
+                const span = document.createElement('span');
+                span.className = "text-gray-400"; // 未表示部分はグレー
+                span.textContent = remainingText;
+                questionText.appendChild(span);
+            }
+        }
+
+        function updateTimer() {
+            if (isAnswering) return;
+
+            const elapsed = Date.now() - questionStartTime;
+            let remaining = TIME_LIMIT_MS - elapsed;
+            
+            if (remaining <= 0) {
+                remaining = 0;
+                handleAnswer(null, questions[currentQuestionIndex]); // タイムアップ
+            }
+
+            const percentage = (remaining / TIME_LIMIT_MS) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            // 残り30%を切ったらゲージを赤色に
+            if (percentage < 30 && !timerBar.classList.contains('bg-red-500')) {
+                timerBar.classList.remove('bg-greenmid');
+                timerBar.classList.add('bg-red-500');
+            }
+        }
+
+        function handleAnswer(selectedChoice, qObject) {
+            if (isAnswering) return;
+            isAnswering = true;
+            abortTyping = true; // 文字表示アニメーションを即座に停止
+            clearInterval(globalTimer);
+
+            // 停止した時点から残りの文字をすべて表示
+            completeQuestionText(qObject);
+
+            const correctChoice = qObject.correct;
+            const isCorrect = (selectedChoice === correctChoice);
+            
+            // ボタンのスタイル変更
+            const buttons = choicesContainer.querySelectorAll('button');
+            buttons.forEach((btn) => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-greenbg', 'text-greenline', 'border-greenline');
+                
+                if (btn.innerText === correctChoice) {
+                    btn.classList.add('bg-greenmid', 'text-white', 'border-greenmid'); // 正解
+                } else if (btn.innerText === selectedChoice) {
+                    btn.classList.add('bg-red-500', 'text-white', 'border-red-500'); // 誤答
+                } else {
+                    btn.classList.add('bg-gray-100', 'text-gray-400', 'border-gray-200'); // その他
+                }
+            });
+
+            // スコア計算
+            if (isCorrect) {
+                const elapsed = Date.now() - questionStartTime;
+                // ベース100点 + 残り時間ボーナス(最大900点)
+                const ratio = Math.max(0, TIME_LIMIT_MS - elapsed) / TIME_LIMIT_MS;
+                const points = 100 + Math.floor(900 * ratio);
+                
+                baseScore += points;
+                currentScoreEl.innerText = baseScore * multiplier;
+                
+                judgeTitle.innerText = "正解！🎉";
+                judgeTitle.className = "text-xl font-bold text-center mb-2 text-greenline";
+            } else {
+                judgeTitle.innerText = selectedChoice === null ? "時間切れ..." : "不正解...";
+                judgeTitle.className = "text-xl font-bold text-center mb-2 text-red-500";
+            }
+
+            // 解説パネルの表示
+            explanationText.innerText = qObject.explanation;
+            explanationPanel.classList.remove('hidden');
+            explanationPanel.classList.add('flex');
+            
+            // スクロールを一番下へ
+            setTimeout(() => {
+                screenGame.scrollTo({ top: screenGame.scrollHeight, behavior: 'smooth' });
+            }, 50);
+        }
+
+        function goNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            score = baseScore * multiplier;
+            finalScoreEl.innerText = score;
+            
+            if (multiplier > 1) {
+                bonusText.classList.remove('hidden');
+            } else {
+                bonusText.classList.add('hidden');
+            }
+
+            // 報酬ランク判定
+            // 最大得点: 1問1000pt × 7問 = 7000pt (multiplier=1の場合)
+            const maxScore = questions.length * 1000 * multiplier;
+            
+            const thresholdS = maxScore * 0.85; // 85%以上
+            const thresholdA = maxScore * 0.65; // 65%以上
+            const thresholdB = maxScore * 0.40; // 40%以上
+
+            if (score >= thresholdS) {
+                setReward("S", "bg-yellow-400", "席の予約", "text-yellow-600", "圧倒的な速さ！特別な予約枠を利用できます。");
+            } else if (score >= thresholdA) {
+                setReward("A", "bg-gray-400", "学食とパン30％割引", "text-gray-700", "高スコアクリア！お得に食事ができます。");
+            } else if (score >= thresholdB) {
+                setReward("B", "bg-orange-400", "アイス無料券", "text-orange-600", "クリア！デザートを楽しんでください。");
+            } else {
+                setReward("C", "bg-gray-600", "報酬なし", "text-gray-600", "あともう少し！次回はもっと早く解答しよう！");
+            }
+
+            showScreen(screenResult);
+        }
+
+        function setReward(rankText, rankColorClass, title, titleColorClass, desc) {
+            rankBadge.innerText = rankText;
+            rankBadge.className = `absolute -top-3 -right-3 w-12 h-12 rounded-full text-white font-bold text-xl flex items-center justify-center shadow-md transform rotate-12 ${rankColorClass}`;
+            
+            rewardTitle.innerText = title;
+            rewardTitle.className = `text-2xl font-bold ${titleColorClass}`;
+            
+            rewardDesc.innerText = desc;
+        }
+
+        function resetGame() {
+            showScreen(screenStart);
+        }
+    </script>
+</body>
+</html>
