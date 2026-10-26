@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>脳トレ早押しクイズ</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -139,6 +140,12 @@
             <button id="btn-retry" class="w-full bg-gray-800 text-white font-bold py-4 rounded-lg mt-6 hover:bg-gray-700 transition-colors shadow-sm">
                 トップへ戻る
             </button>
+            <button id="btn-share" class="w-full bg-[#1DA1F2] text-white font-bold py-4 rounded-lg mt-4 flex items-center justify-center gap-2 hover:bg-[#1DA1F2]/90 transition-colors shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                </svg>
+                結果をシェアする
+            </button>
         </main>
     </div>
 
@@ -233,6 +240,7 @@
         const rewardDesc = document.getElementById('reward-desc');
         const bonusText = document.getElementById('bonus-text');
         const multiplierBadge = document.getElementById('multiplier-badge');
+        const btnShare = document.getElementById('btn-share');
 
         // ------------------------------------
         // 初期化処理
@@ -253,6 +261,7 @@
             btnStart.addEventListener('click', startGame);
             btnRetry.addEventListener('click', resetGame);
             btnNext.addEventListener('click', goNextQuestion);
+            btnShare.addEventListener('click', shareResult);
         });
 
         function showScreen(screenEl) {
@@ -384,11 +393,14 @@
             const buttons = choicesContainer.querySelectorAll('button');
             buttons.forEach((btn) => {
                 btn.disabled = true;
-                btn.classList.remove('hover:bg-greenbg', 'text-greenline', 'border-greenline');
+                // クラスを完全にリセットしてから再適用することで、文字が空白になるバグを防止
+                btn.className = "border-2 font-bold py-3 px-2 rounded-lg text-sm md:text-base transition-colors";
                 
-                if (btn.innerText === correctChoice) {
+                const btnText = btn.textContent.trim();
+                
+                if (btnText === correctChoice) {
                     btn.classList.add('bg-greenmid', 'text-white', 'border-greenmid'); // 正解
-                } else if (btn.innerText === selectedChoice) {
+                } else if (btnText === selectedChoice) {
                     btn.classList.add('bg-red-500', 'text-white', 'border-red-500'); // 誤答
                 } else {
                     btn.classList.add('bg-gray-100', 'text-gray-400', 'border-gray-200'); // その他
@@ -461,6 +473,66 @@
             }
 
             showScreen(screenResult);
+        }
+
+        async function shareResult() {
+            const shareText = `MAXIMUMは、${score}点とったよ！ #TCUリーグ`;
+            const captureArea = document.getElementById('screen-result');
+            
+            // スクリーンショットに含めない要素（ボタン類）を一時的に非表示
+            btnRetry.style.display = 'none';
+            btnShare.style.display = 'none';
+
+            try {
+                const canvas = await html2canvas(captureArea, {
+                    scale: 2, // 高画質化
+                    useCORS: true,
+                    backgroundColor: '#f9fafb'
+                });
+                
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+                    const file = new File([blob], 'result.png', { type: 'image/png' });
+                    
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        // 画像を含めたシェア
+                        try {
+                            await navigator.share({
+                                title: '脳トレ早押しクイズ 結果',
+                                text: shareText,
+                                files: [file]
+                            });
+                        } catch (e) {
+                            console.log('Share canceled or failed', e);
+                        }
+                    } else if (navigator.share) {
+                        // テキストのみのシェア（画像共有非対応環境用）
+                        try {
+                            await navigator.share({
+                                title: '脳トレ早押しクイズ 結果',
+                                text: shareText
+                            });
+                        } catch (e) {
+                            console.log('Share text canceled or failed', e);
+                        }
+                    } else {
+                        // 共有API自体が非対応の環境 (クリップボードへコピー)
+                        const tempInput = document.createElement("input");
+                        document.body.appendChild(tempInput);
+                        tempInput.value = shareText;
+                        tempInput.select();
+                        document.execCommand("copy");
+                        document.body.removeChild(tempInput);
+                        console.log("テキストをクリップボードにコピーしました");
+                    }
+                });
+            } catch (error) {
+                console.error("Screenshot failed:", error);
+            } finally {
+                // ボタンの表示を元に戻す
+                btnRetry.style.display = 'block';
+                btnShare.style.display = 'flex';
+            }
         }
 
         function setReward(rankText, rankColorClass, title, titleColorClass, desc) {
