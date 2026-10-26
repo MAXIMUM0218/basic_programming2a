@@ -205,8 +205,7 @@
         let abortTyping = false; // タイプライター演出の中断フラグ
 
         const TIME_LIMIT_MS = 15000; // 1問15秒固定
-        const CHAR_DELAY_MS = 50;    // 1文字ごとの間隔
-        const CHUNK_DELAY_MS = 600;  // 文節ごとの間隔
+        const CHAR_DELAY_MS = 80;    // 1文字ごとの間隔 (みんはや風に一定の速度)
 
         // ------------------------------------
         // DOM要素の取得
@@ -322,30 +321,21 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        // ハイブリッド・タイプライター演出 (1文字表示 + チャンク間待機)
+        // みんはや風・一定速度でのタイプライター演出 (1文字表示、チャンク待機なし)
         async function typeQuestionText(phrases) {
-            for (let i = 0; i < phrases.length; i++) {
-                const phrase = phrases[i];
-                
-                // 1文字ずつ追加
-                for (let j = 0; j < phrase.length; j++) {
-                    if (abortTyping) return; // 解答されたら中断
-                    questionText.textContent += phrase[j];
-                    await sleep(CHAR_DELAY_MS);
-                }
-                
-                if (abortTyping) return;
-                
-                // チャンク（文節）の終わりで少し長めの間を設ける（最後のチャンクを除く）
-                if (i < phrases.length - 1) {
-                    await sleep(CHUNK_DELAY_MS);
-                }
+            // 配列を結合し、パイプ(|)などの区切り文字があれば削除してプレーンなテキストにする
+            const fullText = phrases.join("").replace(/\|/g, "");
+            
+            for (let i = 0; i < fullText.length; i++) {
+                if (abortTyping) return; // 解答されたら中断
+                questionText.textContent += fullText[i];
+                await sleep(CHAR_DELAY_MS);
             }
         }
 
         // 残りの未表示テキストをグレーで表示する
         function completeQuestionText(qObject) {
-            const fullText = qObject.phrases.join("");
+            const fullText = qObject.phrases.join("").replace(/\|/g, "");
             const currentText = questionText.textContent;
             
             if (currentText.length < fullText.length) {
