@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>借金ダッシュ</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:sans-serif;
+    overflow:hidden;
+}
+
+#game{
+    width:100vw;
+    height:100vh;
+    position:relative;
+    background:linear-gradient(grey,#f0f8ff);
+    overflow:hidden;
+}
+
+#ui{
+    position:absolute;
+    top:10px;
+    left:10px;
+    z-index:10;
+    font-size:20px;
+    font-weight:bold;
+}
+
+#player{
+    position:absolute;
+    width:50px;
+    height:50px;
+    background:#0066ff;
+    border-radius:10px;
+    bottom:30px;
+}
+
+.item{
+    position:absolute;
+    width:40px;
+    height:40px;
+    font-size:30px;
+    text-align:center;
+    line-height:40px;
+}
+
+.screen{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.85);
+    color:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:15px;
+    z-index:100;
+    text-align:center;
+    padding:20px;
+}
+
+button{
+    padding:12px 25px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+#controls{
+    position:absolute;
+    bottom:20px;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    gap:20px;
+}
+
+.ctrl{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    font-size:30px;
+}
+
+#resultReward{
+    margin-top:10px;
+    font-size:22px;
+}
+</style>
+</head>
+<body>
+
+<div id="game">
+
+<div id="ui">
+💰 資産: <span id="money">-100000</span>円<br>
+⏰ 残り: <span id="time">60</span>秒
+</div>
+
+<div id="player"></div>
+
+<div id="controls">
+<button class="ctrl" id="leftBtn">◀</button>
+<button class="ctrl" id="rightBtn">▶</button>
+</div>
+
+<div id="startScreen" class="screen">
+
+    <h1>💸 借金ダッシュ</h1>
+
+    <p>
+        借金100,000円を返済しろ！
+    </p>
+
+    <div style="
+        background:rgba(255,255,255,0.1);
+        padding:15px;
+        border-radius:10px;
+        max-width:500px;
+        text-align:left;
+        line-height:1.8;
+    ">
+        <h3>📖 ルール</h3>
+
+        💰 お金：+5,000円<br>
+        💎 大金：+10,000円<br>
+        🧾 請求書：-10,000円<br><br>
+
+        📈 投資イベント(資金0円の場合行われない)<br>
+        ・50% → 資産2倍<br>
+        ・40% → 資産半減<br>
+        ・10% → 資産全損(借金プラス30万円)<br><br>
+
+        ⏰ 制限時間：60秒<br>
+
+        💎 資産が多いほど
+        レア報酬の当選確率アップ！
+    </div>
+
+    <button onclick="startGame()">
+        ゲーム開始
+    </button>
+</div>
+
+<div id="resultScreen" class="screen" style="display:none;">
+<h1>ゲーム終了</h1>
+
+<h2 id="resultMoney"></h2>
+<h2 id="resultRank"></h2>
+
+<div id="resultReward"></div>
+
+<button onclick="location.reload()">
+もう一度遊ぶ
+</button>
+</div>
+
+</div>
+
+<script>
+
+//===================
+// 報酬設定
+//===================
+
+const REWARDS = {
+
+    N:[
+        "報酬:座席指定券",
+        "報酬:図書館特典券",
+        "報酬:売店割引券"
+    ],
+
+    R:[
+        "報酬:学食割引券（1割）",
+        "報酬:パン割引券"
+    ],
+
+    SR:[
+        "報酬:サーティワン割引券",
+        "報酬:朝食無料券"
+    ],
+
+    SSR:[
+        "報酬:学食半額券"
+    ]
+};
+
+//===================
+// ランク別確率
+//===================
+
+const RANK_RATES = {
+
+    debtKing:{
+        SSR:1,
+        SR:9,
+        R:30,
+        N:60
+    },
+
+    freeter:{
+        SSR:3,
+        SR:12,
+        R:35,
+        N:50
+    },
+
+    employee:{
+        SSR:8,
+        SR:22,
+        R:35,
+        N:35
+    },
+
+    president:{
+        SSR:15,
+        SR:35,
+        R:30,
+        N:20
+    },
+
+    billionaire:{
+        SSR:30,
+        SR:40,
+        R:20,
+        N:10
+    }
+
+};
+
+let gameStarted=false;
+let gameOver=false;
+
+let money=-100000;
+let timeLeft=60;
+
+const laneCount=5;
+let lane=2;
+
+const laneWidth=window.innerWidth/laneCount;
+
+const player=document.getElementById("player");
+
+function updatePlayer(){
+
+    player.style.left=
+    lane*laneWidth + laneWidth/2 - 25 + "px";
+}
+
+updatePlayer();
+
+document.addEventListener("keydown",(e)=>{
+
+    if(!gameStarted || gameOver) return;
+
+    if(e.key==="ArrowLeft" && lane>0){
+        lane--;
+        updatePlayer();
+    }
+
+    if(e.key==="ArrowRight" && lane<laneCount-1){
+        lane++;
+        updatePlayer();
+    }
+
+});
+
+document.getElementById("leftBtn").onclick=()=>{
+
+    if(!gameStarted || gameOver) return;
+
+    if(lane>0){
+        lane--;
+        updatePlayer();
+    }
+};
+
+document.getElementById("rightBtn").onclick=()=>{
+
+    if(!gameStarted || gameOver) return;
+
+    if(lane<laneCount-1){
+        lane++;
+        updatePlayer();
+    }
+};
+
+function startGame(){
+
+    gameStarted=true;
+
+    document.getElementById("startScreen")
+    .style.display="none";
+
+    spawnLoop();
+
+    updateLoop();
+
+    countdown();
+}
+
+function spawnLoop(){
+
+    if(gameOver) return;
+
+    createItem();
+
+    setTimeout(spawnLoop,800);
+}
+
+function createItem(){
+
+    const item=document.createElement("div");
+    item.className="item";
+
+    const r=Math.random();
+
+    let type;
+
+    if(r<0.5){
+
+        type="money";
+        item.textContent="💰";
+
+    }else if(r<0.7){
+
+        type="bill";
+        item.textContent="🧾";
+
+    }else if(r<0.9){
+
+        type="big";
+        item.textContent="💎";
+
+    }else{
+
+        type="invest";
+        item.textContent="📈";
+    }
+
+    item.dataset.type=type;
+
+    const spawnLane=
+    Math.floor(Math.random()*laneCount);
+
+    item.style.left=
+    spawnLane*laneWidth + laneWidth/2 -20 +"px";
+
+    item.style.top="-50px";
+
+    game.appendChild(item);
+}
+
+function updateLoop(){
+
+    if(gameOver) return;
+
+    document.querySelectorAll(".item")
+    .forEach(item=>{
+
+        let top=parseFloat(item.style.top);
+
+        top+=5;
+
+        item.style.top=top+"px";
+
+        const itemLane=Math.floor(
+            parseFloat(item.style.left)/laneWidth
+        );
+
+        if(top>window.innerHeight-120 &&
+           itemLane===lane){
+
+            hitItem(item.dataset.type);
+
+            item.remove();
+        }
+
+        if(top>window.innerHeight){
+
+            item.remove();
+        }
+
+    });
+
+    requestAnimationFrame(updateLoop);
+}
+
+function hitItem(type){
+
+    if(type==="money"){
+        money+=5000;
+    }
+
+    if(type==="big"){
+        money+=10000;
+    }
+
+    if(type==="bill"){
+        money-=10000;
+    }
+
+    if(type==="invest"){
+        investEvent();
+    }
+
+    updateUI();
+}
+
+function investEvent(){
+
+    if(money===0){
+        alert("資産が0円のため投資できません!")
+     return
+    }
+
+    const invest=
+    confirm(
+`投資しますか？
+
+OK → 投資
+キャンセル → 見送り`
+    );
+
+    if(!invest) return;
+
+    const r=Math.random();
+
+    if(r<0.5){
+if(money>=0){
+        money*=2;
+        alert("投資成功！資産2倍！");}
+        else if(money<0){
+               money=Math.floor(money/2);
+
+               alert("投資成功！資産2倍！");
+
+        }
+
+    }
+    else if(r<0.9){
+if(money>=0){
+        money=Math.floor(money/2);
+        alert("投資失敗！資産半減！");
+}
+
+else if(money<0){
+  money*=2;
+          alert("投資失敗！資産半減！");
+}
+    }
+    else {
+if(money>=0){
+money=money+(-300000);
+        alert("大暴落！借金増額！");
+}
+else if(money<0){
+        money=money-300000;
+        alert("大暴落！借金増額！");
+    }}
+
+    updateUI();
+}
+
+function updateUI(){
+
+    document.getElementById("money")
+    .innerText=money.toLocaleString();
+}
+
+function countdown(){
+
+    const timer=setInterval(()=>{
+
+        if(gameOver){
+
+            clearInterval(timer);
+            return;
+        }
+
+        timeLeft--;
+
+        document.getElementById("time")
+        .innerText=timeLeft;
+
+        if(timeLeft<=0){
+
+            clearInterval(timer);
+
+            endGame();
+        }
+
+    },1000);
+}
+
+function getRank(){
+
+    if(money<0){
+
+        return {
+            name:"借金王",
+            key:"debtKing"
+        };
+    }
+
+    if(money<50000){
+
+        return {
+            name:"フリーター",
+            key:"freeter"
+        };
+    }
+
+    if(money<100000){
+
+        return {
+            name:"会社員",
+            key:"employee"
+        };
+    }
+
+    if(money<500000){
+
+        return {
+            name:"社長",
+            key:"president"
+        };
+    }
+
+    return{
+        name:"億万長者",
+        key:"billionaire"
+    };
+}
+
+function rollReward(rankKey){
+
+    const rates=RANK_RATES[rankKey];
+
+    const rand=Math.random()*100;
+
+    let sum=0;
+
+    for(const rarity of ["SSR","SR","R","N"]){
+
+        sum+=rates[rarity];
+
+        if(rand<=sum){
+
+            const pool=
+            REWARDS[rarity];
+
+            return {
+                rarity,
+                reward:
+                pool[Math.floor(
+                    Math.random()*pool.length
+                )]
+            };
+        }
+    }
+
+    return {
+        rarity:"N",
+        reward:REWARDS.N[0]
+    };
+}
+
+function endGame(){
+
+    gameOver=true;
+
+    const rank=getRank();
+
+    const reward=
+    rollReward(rank.key);
+
+    document.getElementById("resultMoney")
+    .innerText=
+    `資産：${money.toLocaleString()}円`;
+
+    document.getElementById("resultRank")
+    .innerText=
+    `ランク：${rank.name}`;
+
+    document.getElementById("resultReward")
+    .innerHTML=
+    `
+    🎁 獲得報酬<br><br>
+    レア度：${reward.rarity}<br>
+    ${reward.reward}
+    `;
+
+    document.getElementById("resultScreen")
+    .style.display="flex";
+}
+
+</script>
+
+</body>
+</html>
