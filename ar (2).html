@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>ARで探そう！ - 360°探索ゲーム</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; touch-action: none; overscroll-behavior: none; }
+        
+        /* 1. 一番下の背景: カメラ映像 */
+        #camera-feed {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            object-fit: cover; z-index: 0;
+        }
+
+        /* 2. 中間レイヤー: A-Frame（3D空間） */
+        #aframe-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10;
+        }
+
+        /* 3. 一番上のレイヤー: UI（タップを貫通させる） */
+        #ui-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 20;
+            pointer-events: none; /* UIの背景部分はタップをすり抜けて3Dキャンバスへ届くようにする */
+        }
+
+        /* ボタンやスライダーなど、操作が必要なUI部分だけタップを有効にする */
+        .pointer-events-auto { pointer-events: auto; }
+        
+        /* 縦型スライダーのCSS */
+        input[type=range][orient=vertical] {
+            writing-mode: bt-lr; 
+            -webkit-appearance: slider-vertical;
+        }
+
+        /* A-Frameの不要なUIを隠す */
+        .a-enter-vr { display: none !important; }
+        .a-orientation-modal { display: none !important; }
+    </style>
+
+    <script>
+        // ゲームの進行状況を管理する変数
+        let score = 0;
+        let foundCount = 0;
+        let timeLeft = 60;
+        let isPlaying = false;
+        let timerInterval;
+
+        // --- A-Frame カスタムコンポーネント (クリック判定用) ---
+        AFRAME.registerComponent('collectible', {
+            schema: { 
+                isTarget: { type: 'boolean' }, 
+                id: { type: 'string' } 
+            },
+            init: function () {
+                this.el.addEventListener('click', () => {
+                    // ゲーム中ではない、または既に回収済みの場合は無視
+                    if (!isPlaying || this.el.dataset.collected) return;
+                    this.el.dataset.collected = "true";
+
+                    if (this.data.isTarget) {
+                        // ターゲット正解時の処理
+                        score += 100;
+                        foundCount++;
+                        document.getElementById('score-val').innerText = score;
+                        
+                        // 右上のUIに赤丸(⭕)をつける
+                        const mark = document.getElementById(`mark-${this.data.id}`);
+                        if(mark) {
+                            mark.classList.remove('hidden');
+                            mark.classList.add('flex');
+                        }
+
+                        // 縮小しながら消えるアニメーション
+                        this.el.setAttribute('animation', 'property: scale; to: 0 0 0; dur: 300; easing: easeInBack');
+                        setTimeout(() => { if (this.el.parentNode) this.el.remove(); }, 300);
+
+                        // 5個全て見つけたらクリア！
+                        if (foundCount >= 5) {
+                            setTimeout(() => endGame(true), 500);
+                        }
+                    } else {
+                        // ダミー不正解時（ハズレ）の処理
+                        const missText = document.getElementById('miss-text');
+                        missText.style.opacity = 1;
+                        setTimeout(() => { missText.style.opacity = 0; }, 800);
+
+                        // 下に落ちていくアニメーション
+                        const pos = this.el.object3D.position;
+                        this.el.setAttribute('animation', `property: position; to: ${pos.x} -5 ${pos.z}; dur: 800; easing: easeInQuad`);
+                        setTimeout(() => { if (this.el.parentNode) this.el.remove(); }, 800);
+                    }
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+
+    <!-- カメラ背景 -->
+    <video id="camera-feed" autoplay playsinline muted></video>
+
+    <!-- A-Frame 3D空間 -->
+    <div id="aframe-container">
+        <!-- alpha="true" で背景を透明にし、video要素を透けさせる -->
+        <a-scene embedded renderer="alpha: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+            <a-camera id="main-camera" position="0 1.6 0" fov="80" look-controls>
+                
+                <!-- 画面中央の照準（レティクル）。スマホのタップでクリック判定になる -->
+                <a-entity cursor="fuse: false; rayOrigin: entity;" 
+                          position="0 0 -1" 
+                          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" 
+                          material="color: white; shader: flat; opacity: 0.8"
+                          raycaster="objects: .clickable"
+                          animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 150; from: 0.5 0.5 0.5; to: 1 1 1">
+                </a-entity>
+
+            </a-camera>
+
+            <!-- 生成したオブジェクトを入れる親要素 -->
+            <a-entity id="objects-container"></a-entity>
+        </a-scene>
+    </div>
+
+    <!-- UI レイヤー -->
+    <div id="ui-layer">
+        
+        <!-- ゲーム中のHUD (最初は非表示) -->
+        <div id="hud" class="hidden w-full h-full relative">
+            
+            <!-- 上部: タイマー＆スコア -->
+            <div class="absolute top-4 left-1/2 transform -translate-x-1/2 flex gap-4 pointer-events-auto">
+                <div class="bg-black/70 backdrop-blur text-white px-5 py-2 rounded-xl text-center border border-slate-600 shadow-lg min-w-[5rem]">
+                    <div class="text-[10px] font-bold text-gray-400 mb-1">TIME</div>
+                    <div id="time-val" class="text-2xl font-black text-amber-400 leading-none">60</div>
+                </div>
+                <div class="bg-black/70 backdrop-blur text-white px-5 py-2 rounded-xl text-center border border-slate-600 shadow-lg min-w-[5rem]">
+                    <div class="text-[10px] font-bold text-gray-400 mb-1">SCORE</div>
+                    <div id="score-val" class="text-2xl font-black text-blue-400 leading-none">0</div>
+                </div>
+            </div>
+
+            <!-- 右側: ターゲット図形リスト -->
+            <div id="target-list" class="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-3 pointer-events-auto bg-black/60 p-3 rounded-2xl border border-slate-600 shadow-lg">
+                <div class="text-white text-[10px] font-bold text-center mb-1">TARGETS</div>
+                <!-- JSで図形アイコンがここに生成されます -->
+            </div>
+
+            <!-- 左側: ズームスライダー -->
+            <div class="absolute left-4 top-1/2 transform -translate-y-1/2 flex flex-col items-center pointer-events-auto bg-black/60 p-4 rounded-full border border-slate-600 shadow-lg">
+                <span class="text-white text-[10px] font-bold mb-3 tracking-wider">ZOOM</span>
+                <input type="range" id="zoom-slider" min="30" max="100" value="80" orient="vertical" class="h-40 w-3 appearance-none bg-slate-500 rounded-full cursor-pointer outline-none">
+            </div>
+
+            <!-- 画面中央: ハズレ演出テキスト -->
+            <div id="miss-text" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-rose-500 font-black text-6xl md:text-8xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] opacity-0 transition-opacity duration-300 pointer-events-none tracking-widest whitespace-nowrap">
+                ハズレ！
+            </div>
+        </div>
+
+        <!-- スタート画面 -->
+        <div id="start-screen" class="absolute inset-0 bg-gray-900/90 backdrop-blur-md flex flex-col items-center justify-center pointer-events-auto z-50 p-6 text-center">
+            <h1 class="text-4xl font-black text-white mb-2 tracking-wide">AR宝探し</h1>
+            <p class="text-rose-400 font-bold mb-6 text-lg">ダミーに注意！</p>
+            <div class="bg-black/50 p-5 rounded-2xl mb-8 border border-slate-600 max-w-sm">
+                <p class="text-gray-200 text-sm leading-relaxed font-medium text-left">
+                    ① スマホを動かして周囲を見渡そう。<br>
+                    ② 中央の<span class="text-white font-bold">白い丸（照準）</span>をターゲットに合わせる。<br>
+                    ③ 画面のどこかを<span class="text-white font-bold">タップ</span>して回収！<br>
+                    ④ 右上の5つのターゲットを見つけよう。
+                </p>
+            </div>
+            <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-10 rounded-full shadow-lg shadow-indigo-600/50 text-xl transform transition hover:scale-105 active:scale-95 w-full max-w-xs">
+                カメラを許可して開始
+            </button>
+        </div>
+
+        <!-- リザルト画面 (最初は非表示) -->
+        <div id="result-screen" class="absolute inset-0 bg-gray-900/95 backdrop-blur-md flex-col items-center justify-center pointer-events-auto z-50 hidden p-6 text-center">
+            <h2 id="res-title" class="text-5xl font-black text-white mb-8 tracking-wider">RESULT</h2>
+            
+            <div id="res-rank" class="text-6xl font-black text-amber-400 mb-6 drop-shadow-lg">S RANK</div>
+            
+            <div class="bg-black/50 rounded-2xl p-6 mb-8 border border-slate-700 w-full max-w-sm shadow-inner text-left">
+                <p class="text-gray-400 text-sm font-bold mb-1">FINAL SCORE</p>
+                <p class="text-4xl text-white font-black mb-4" id="res-score">0</p>
+                
+                <p class="text-gray-400 text-sm font-bold mb-1">REWARD (報酬)</p>
+                <p class="text-lg text-white font-bold leading-tight" id="res-reward">クーポン獲得！</p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-4 px-10 rounded-full shadow-lg text-xl w-full max-w-xs transition transform hover:scale-105">
+                もう一度遊ぶ
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 探すべき5つのターゲット図形の定義
+        const targetDefs = [
+            { id: 't1', shape: 'box', color: '#EF4444' },      // 赤の四角
+            { id: 't2', shape: 'sphere', color: '#3B82F6' },    // 青の丸
+            { id: 't3', shape: 'cylinder', color: '#10B981' },  // 緑の円柱
+            { id: 't4', shape: 'cone', color: '#EAB308' },      // 黄の円錐
+            { id: 't5', shape: 'torus', color: '#A855F7' }      // 紫のドーナツ
+        ];
+
+        // UI構築処理 (右側のターゲットリスト)
+        function buildUI() {
+            const list = document.getElementById('target-list');
+            targetDefs.forEach(def => {
+                const item = document.createElement('div');
+                item.className = 'w-12 h-12 rounded-lg relative flex justify-center items-center overflow-hidden border border-slate-700 shadow-inner';
+                item.style.backgroundColor = def.color;
+                item.innerHTML = `
+                    <div id="mark-${def.id}" class="hidden absolute inset-0 bg-black/50 items-center justify-center">
+                        <span class="text-red-500 font-black text-4xl transform -rotate-12 drop-shadow-md">⭕</span>
+                    </div>`;
+                list.appendChild(item);
+            });
+        }
+
+        // オブジェクトのランダム配置座標を生成
+        function getRandomPos() {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 2.5 + Math.random() * 2.5; // 半径2.5m 〜 5m の円周上
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            const y = (Math.random() - 0.5) * 3 + 1; // 高さ -0.5m 〜 2.5m
+            return { x, y, z };
+        }
+
+        // 空間にターゲットとダミーを配置する処理
+        function spawnObjects() {
+            const container = document.getElementById('objects-container');
+            container.innerHTML = ''; // 初期化
+            
+            // ターゲット(5個)の配置
+            targetDefs.forEach(def => {
+                const pos = getRandomPos();
+                const el = document.createElement('a-entity');
+                el.setAttribute('geometry', `primitive: ${def.shape}; radius: 0.3; width: 0.5; height: 0.5; depth: 0.5; radiusTubular: 0.1`);
+                el.setAttribute('material', `color: ${def.color}; roughness: 0.3; metalness: 0.2`);
+                el.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+                el.setAttribute('animation', 'property: rotation; to: 360 360 360; loop: true; dur: 4000; easing: linear');
+                el.setAttribute('class', 'clickable'); // Raycasterが反応する目印
+                el.setAttribute('collectible', `isTarget: true; id: ${def.id}`); // カスタム判定用
+                container.appendChild(el);
+            });
+
+            // ダミー(15個)の配置
+            const dummyShapes = ['octahedron', 'dodecahedron', 'tetrahedron'];
+            const dummyColors = ['#9CA3AF', '#F472B6', '#22D3EE', '#FFFFFF', '#FDBA74'];
+            for (let i = 0; i < 15; i++) {
+                const pos = getRandomPos();
+                const shape = dummyShapes[Math.floor(Math.random() * dummyShapes.length)];
+                const color = dummyColors[Math.floor(Math.random() * dummyColors.length)];
+                
+                const el = document.createElement('a-entity');
+                el.setAttribute('geometry', `primitive: ${shape}; radius: 0.4`);
+                el.setAttribute('material', `color: ${color}; roughness: 0.5; metalness: 0.1`);
+                el.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+                el.setAttribute('animation', 'property: rotation; to: -360 360 -360; loop: true; dur: 5000; easing: linear');
+                el.setAttribute('class', 'clickable');
+                el.setAttribute('collectible', `isTarget: false; id: dummy`);
+                container.appendChild(el);
+            }
+        }
+
+        // ゲーム開始ボタンの処理
+        document.getElementById('start-btn').addEventListener('click', async () => {
+            // iOS等のジャイロセンサー許可要求
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                try { 
+                    const permission = await DeviceOrientationEvent.requestPermission(); 
+                    if (permission === 'granted') {
+                        // 許可後にA-Frameのカメラコントロールを再起動して傾き連動を確実にする
+                        const cam = document.getElementById('main-camera');
+                        cam.removeAttribute('look-controls');
+                        setTimeout(() => cam.setAttribute('look-controls', 'touchEnabled: true'), 50);
+                    }
+                } catch (e) { 
+                    console.warn("Sensor permission error", e); 
+                }
+            } else {
+                // Android等、明示的な許可が不要な端末でも再起動して適用させる
+                const cam = document.getElementById('main-camera');
+                cam.removeAttribute('look-controls');
+                setTimeout(() => cam.setAttribute('look-controls', 'touchEnabled: true'), 50);
+            }
+
+            // 背面カメラ映像の取得
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                document.getElementById('camera-feed').srcObject = stream;
+            } catch (e) {
+                console.warn("Camera access denied or unavailable. Running in virtual space.");
+                // カメラが取得できなくてもゲーム進行自体は止めない
+            }
+
+            // 画面の切り替え
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('hud').classList.remove('hidden');
+            
+            buildUI();
+            spawnObjects();
+            
+            // タイマー起動
+            isPlaying = true;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time-val').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    endGame(false); // タイムアップ
+                }
+            }, 1000);
+        });
+
+        // ズームスライダー連動 (A-FrameカメラのFOVを変更)
+        document.getElementById('zoom-slider').addEventListener('input', (e) => {
+            document.getElementById('main-camera').setAttribute('fov', e.target.value);
+        });
+
+        // ゲーム終了とリザルト画面の表示
+        function endGame(isWin) {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            
+            // 成功時は残り時間ボーナスを加算
+            if (isWin) {
+                score += timeLeft * 100;
+            } else {
+                document.getElementById('res-title').innerText = "TIME UP...";
+                document.getElementById('res-title').className = "text-5xl font-black text-rose-500 mb-8 tracking-wider";
+            }
+
+            // 画面切り替え
+            document.getElementById('hud').classList.add('hidden');
+            const resScreen = document.getElementById('result-screen');
+            resScreen.classList.remove('hidden');
+            resScreen.classList.add('flex'); // hiddenを外してflexboxを適用
+
+            document.getElementById('res-score').innerText = score;
+
+            // スコアによるランクと報酬の決定
+            const rankEl = document.getElementById('res-rank');
+            const rewardEl = document.getElementById('res-reward');
+
+            if (score >= 5000) {
+                rankEl.innerText = "S RANK 👑";
+                rankEl.className = "text-6xl font-black text-amber-400 mb-6 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]";
+                rewardEl.innerText = "中川駅周辺 特別クーポン獲得！";
+            } else if (score >= 2000) {
+                rankEl.innerText = "A RANK ⭐";
+                rankEl.className = "text-6xl font-black text-blue-400 mb-6 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]";
+                rewardEl.innerText = "ドリンク割引券（トッピング無料）";
+            } else {
+                rankEl.innerText = "B RANK";
+                rankEl.className = "text-6xl font-black text-gray-400 mb-6 drop-shadow-md";
+                rewardEl.innerText = "オリジナルスマホ壁紙";
+            }
+        }
+    </script>
+</body>
+</html>
