@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>第4回</title>
+  <meta name="descripution" content="サンプル">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="icon" href="img2026/favicon.ico">
+  <link rel="stylesheet" type="text/css" href="css2026/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css2026/common.css">
+  <link rel="stylesheet" type="text/css" href="site.css">
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="js2026/home.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
+</head>
+
+<body class="">
+  <header id="header" class="DownMove">
+    <div class="logo">
+      <img src="img2026/logo.png" alt="ロゴ">
+    </div>
+    <nav class="onlypc">
+      <ul id="g-navi">
+        <li><a href="04.html">第4回</a></li>
+      </ul>
+    </nav>
+
+    <div class="toggle-btn">
+      <span class="toggle-btn__line toggle-btn__line--top"></span>
+      <span class="toggle-btn__line toggle-btn__line--center"></span>
+      <span class="toggle-btn__line toggle-btn__line--bottom"></span>
+    </div>
+
+    <nav class="global-nav">
+      <div class="global-all">
+        <div class="global-nav__inner">
+          <div class="accordion">
+            <p class="switch2"><a href="04.html">第4回</a></p>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div id="splash" class="sp">
+    <div id="splash_logo" class="sp">
+      <img src="img2026/information.png" alt="河野" class="fadeUp">
+      <img src="img2026/education.png" alt="真喜巳" class="fadeUp">
+    </div>
+  </div>
+  <div id="display" class="sp">
+    <div id="display_logo" class="sp">
+      <p class="text"><strong><img src="img2026/hello.png" alt="インデュケーション"></strong></p>
+    </div>
+  </div>
+
+  <div id="fog" class="op">
+    <div class="global">
+      <p class="conversation2 op">基礎プロ2a</p>
+      <p class="conversation3 op">4週目です。</p>
+    </div>
+  </div>
+
+  <main class="top">
+    <div class="css-scroll-down" style="margin-top: -300px;">
+      <div class="single-scroll-down-animation animation4">
+        <h4>scroll down</h4>
+        <div class="scroll-down4"></div>
+      </div>
+    </div>
+    <section id="area-1">
+      <div class="container">
+
+        <p class="letter conversation">第4回</p>
+
+        <div class="toc">
+          <ul>
+            <li class="summarytext">・<a href="#ren4-1">練習問題4-1</a></li>
+            <li class="summarytext">・<a href="#ren4-2">練習問題4-2</a></li>
+            <li class="summarytext">・<a href="#ren4-3">練習問題4-3</a></li>
+            <li class="summarytext">・<a href="#ren4-4">練習問題4-4</a></li>
+            <li class="summarytext">・<a href="#ren4-5">練習問題4-5</a></li>
+          </ul>
+        </div>
+
+        <div class="balloon1 left-to-right">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>みんなこんにちは！
+            </div>
+          </div>
+        </div>
+
+        <div class="balloon1 left-to-right">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>今回はgetElementsByClassNameを使って、複数の要素をまとめて操作する方法を学ぶよ！
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="balloon1 left-to-right">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ということで以下が今回の課題だよ～
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 全体の課題一覧 -->
+        <div class="problem-list" style="background:#f9f9f9; padding:20px; border-radius:10px; margin-bottom: 20px;">
+          <h3 style="border-bottom: 2px solid #333; padding-bottom: 5px;">本日の課題一覧</h3>
+          <p>
+            次のようなHTMLがあるとき、以下の要件を満たすプログラムを作成しなさい。それぞれボタンがクリックされたら実行されるようにすること（それぞれの問題に一つずつ、ボタンを計2つ作って下さい）。<br>
+            4-1. クラス名がcccのPタグについて、背景色をテキストボックスに入力された色に変更するプログラムを作成せよ。<br>
+            4-2. クラス名がaaa, bbbのPタグについて、背景色をテキストボックスに入力された色に変更するプログラムを作成せよ。
+          </p>
+        </div>
+
+        <div class="balloon1 left-to-right">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>それでは、練習問題4の解説を始めるよ！<br>
+                getElementsByClassNameでクラス名から複数の要素を取得する方法を学ぼう！
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問題4-1の構成 -->
+        <p id="ren4-1"></p>
+        <p><span class="bold">4-1. クラス名がcccのPタグの背景色を変更する</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="bold3">手順.<br>
+              getElementsByClassName('ccc') でクラスcccの要素を全て取得し、for文でループして背景色を変更する。</p>
+            <div class="summary">
+              <p>【問題】</p>
+              <p>以下のようなPタグがあるとき、クラス名が<code>ccc</code>の要素について、テキストボックスに入力された色を背景色に設定するプログラムを作成しなさい。</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>&lt;p class="aaa"&gt;段落1&lt;/p&gt;
+&lt;p class="bbb"&gt;段落2&lt;/p&gt;
+&lt;p class="ccc"&gt;段落3&lt;/p&gt;
+&lt;p class="aaa bbb"&gt;段落4&lt;/p&gt;
+&lt;p class="bbb ccc"&gt;段落5&lt;/p&gt;
+&lt;p class="aaa bbb ccc"&gt;段落6&lt;/p&gt;</code></pre>
+              <p>【サンプルコード（ヒント）】</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function changeCccColor() {
+  // まず全要素の背景色を初期化
+  reset();
+  // テキストボックスから色を取得
+  var color = document.getElementById('________________').value;
+  // クラス名cccの要素を取得
+  var elems = document.getElementsByClassName('________________');
+  // ループして全要素の背景色を変更
+  for (var i = 0; i &lt; elems.length; i++) {
+    elems[i].style.backgroundColor = ________________;
+  }
+}</code></pre>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <p class="bold3">実行結果<br></p>
+            <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 10px; border: 1px solid #ccc;">
+              <!-- 色入力とボタン（4-1・4-2 共通） -->
+              <input type="text" id="demo_colorInput4" value="yellow" placeholder="色名 (例: red, yellow)"
+                style="margin-bottom: 8px; padding: 5px; width: 180px;"><br>
+              <input type="button" value="4-1: クラスcccの色変更" onclick="demoChangeCcc();"
+                style="margin-right: 8px; margin-bottom: 8px;">
+              <!-- デモ用Pタグ群（クラス名はデモ専用のプレフィックスdm-で衝突回避） -->
+              <div id="demo-p-container" style="margin-top: 10px;">
+                <p class="dm-aaa" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落1：クラス aaa</p>
+                <p class="dm-bbb" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落2：クラス bbb</p>
+                <p class="dm-ccc" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落3：クラス ccc</p>
+                <p class="dm-aaa dm-bbb" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落4：クラス aaa bbb</p>
+                <p class="dm-bbb dm-ccc" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落5：クラス bbb ccc</p>
+                <p class="dm-aaa dm-bbb dm-ccc" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落6：クラス aaa bbb ccc</p>
+              </div>
+              <script>
+                // 全Pタグの背景色を初期状態(transparent)に戻す関数
+                function demoReset() {
+                  var ps = document.querySelectorAll('#demo-p-container p');
+                  for (var i = 0; i < ps.length; i++) {
+                    ps[i].style.backgroundColor = 'transparent';
+                  }
+                }
+
+                // 4-1: クラスcccの背景色を変更する関数
+                function demoChangeCcc() {
+                  // まずリセットして初期状態に戻す
+                  demoReset();
+                  // テキストボックスから色を取得する
+                  var color = document.getElementById('demo_colorInput4').value;
+                  // デモ用クラス名「dm-ccc」を持つ要素を全て取得する
+                  var elems = document.getElementById('demo-p-container').getElementsByClassName('dm-ccc');
+                  // ループして全要素の背景色を変更する
+                  for (var i = 0; i < elems.length; i++) {
+                    elems[i].style.backgroundColor = color;
+                  }
+                }
+
+                // 4-2: クラスaaaとbbb両方を持つ要素の背景色を変更する関数
+                function demoChangeAaaBbb() {
+                  // まずリセットして初期状態に戻す
+                  demoReset();
+                  // テキストボックスから色を取得する
+                  var color = document.getElementById('demo_colorInput4').value;
+                  // デモ用クラス「dm-aaa」と「dm-bbb」の両方を持つ要素をスペース区切りで指定して取得する
+                  var elems = document.getElementById('demo-p-container').getElementsByClassName('dm-aaa dm-bbb');
+                  // ループして全要素の背景色を変更する
+                  for (var i = 0; i < elems.length; i++) {
+                    elems[i].style.backgroundColor = color;
+                  }
+                }
+              </script>
+            </div>
+          </div>
+        </div>
+        <div class="balloon1 left-to-right" style="margin: 10px 0 12px;">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ヒント：getElementsByClassName('ccc') はクラスcccを持つ要素を全部まとめて取得できるよ！for文でループしてそれぞれの backgroundColor を変更しよう！</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問題4-2の構成 -->
+        <p id="ren4-2"></p>
+        <p><span class="bold">4-2. クラス名がaaa, bbbのPタグの背景色を変更する</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="bold3">手順.<br>
+              getElementsByClassName('aaa bbb') でクラスaaa・bbb両方を持つ要素を取得する。ボタンクリック時はまず reset() で背景色を初期化してから変更する。</p>
+            <div class="summary">
+              <p>【問題】</p>
+              <p>クラス名が<code>aaa</code>かつ<code>bbb</code>のPタグの背景色を変更するプログラムを作成しなさい。</p>
+              <ul style="font-size: 0.9em; padding-left: 20px;">
+                <li>複数のクラス名を指定するには、<code>document.getElementsByClassName('aaa bbb')</code>のように、クラス名をスペースで区切って指定します。これで「aaa と bbb の両方を持つ要素」だけが取得されます。</li>
+                <li>ボタンがクリックされた時には最初に背景色を初期状態（透明）に戻す必要があります。<br>
+                  初期化には <code>.style.backgroundColor = 'transparent'</code> を使います。<br>
+                  この処理を <code>reset()</code> という関数として定義しておき、各ボタンのクリック時に最初に呼び出します。</li>
+              </ul>
+              <p>【サンプルコード（ヒント）】</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>// 全要素の背景色を初期化する関数
+function reset() {
+  var allP = document.getElementsByTagName('p');
+  for (var i = 0; i &lt; allP.length; i++) {
+    allP[i].style.backgroundColor = 'transparent';
+  }
+}
+
+function changeAaaBbbColor() {
+  // まず全要素の背景色を初期化
+  reset();
+  // テキストボックスから色を取得
+  var color = document.getElementById('________________').value;
+  // クラス名aaa と bbb 両方を持つ要素を取得（スペース区切りで指定）
+  var elems = document.getElementsByClassName('________________');
+  for (var i = 0; i &lt; elems.length; i++) {
+    elems[i].style.backgroundColor = ________________;
+  }
+}</code></pre>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <p class="bold3">実行結果<br></p>
+            <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 10px; border: 1px solid #ccc;">
+              <!-- ボタン（4-2用）：4-1と同じテキストボックス・Pコンテナを共有 -->
+              <input type="button" value="4-2: クラスaaa, bbbの色変更" onclick="demoChangeAaaBbb();"
+                style="margin-right: 8px; margin-bottom: 8px;">
+              <input type="button" value="リセット" onclick="demoReset();"
+                style="margin-bottom: 8px;">
+              <p style="font-size: 0.85em; color: #666; margin: 4px 0;">※ 上のテキストボックスと段落表示エリアを共用しています</p>
+              <!-- 動作の説明 -->
+              <div style="margin-top: 8px; padding: 8px; background: #fff8e1; border-left: 3px solid #f9a825; font-size: 0.85em;">
+                <strong>動作確認：</strong><br>
+                ・「4-1」ボタン → クラスcccを持つ段落3・5・6が着色<br>
+                ・「4-2」ボタン → クラスaaa と bbb 両方持つ段落4・6が着色<br>
+                ・どちらのボタンも押す前に demoReset() で初期化される
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="balloon1 left-to-right" style="margin: 10px 0 12px;">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ヒント：getElementsByClassName('aaa bbb') はクラスaaaとbbbを<strong>両方</strong>持つ要素だけを取得するよ！ボタンを押すたびにまずreset()で初期化してから色を付けよう！</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問題4-3の構成 -->
+        <p id="ren4-3"></p>
+        <p><span class="bold">4-3. getElementsByTagName()でpタグの数を数える</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="bold3">手順.<br>
+              getElementsByTagName('p') でページ内の全pタグを取得し、.length で個数を調べて alert() で表示する。</p>
+            <div class="summary">
+              <p>【問題】</p>
+              <p>pタグが複数含まれているページを作り、<code>getElementsByTagName()</code>を使ってpタグの数を数え、その数を<code>alert()</code>で表示するプログラムを作成しなさい。ボタンをクリックすると実行されるようにすること。<br>
+              ※ 配列の要素数は <code>配列名.length</code> で取得できる。</p>
+              <p>【サンプルコード（ヒント）】</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function countP() {
+  // pタグを全て取得する
+  var elems = document.getElementsByTagName('________________');
+  // 個数を alert() で表示する
+  alert(________________);
+}</code></pre>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <p class="bold3">実行結果<br></p>
+            <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 10px; border: 1px solid #ccc;">
+              <input type="button" value="4-3: pタグの数を表示" onclick="demoCountP();"
+                style="margin-bottom: 8px;">
+              <!-- デモ用の複数pタグ -->
+              <div id="demo43-container" style="margin-top:10px; font-size:0.9em; color:#555;">
+                <p>サンプル段落1</p>
+                <p>サンプル段落2</p>
+                <p>サンプル段落3</p>
+                <p>サンプル段落4</p>
+                <p>サンプル段落5</p>
+              </div>
+              <p style="font-size:0.8em; color:#888; margin-top:6px;">※ このエリア内のpタグ数を表示します</p>
+              <script>
+                // 4-3: デモエリア内のpタグ数をalertで表示する関数
+                function demoCountP() {
+                  var elems = document.getElementById('demo43-container').getElementsByTagName('p');
+                  alert('pタグの数：' + elems.length);
+                }
+              </script>
+            </div>
+          </div>
+        </div>
+        <div class="balloon1 left-to-right" style="margin: 10px 0 12px;">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ヒント：getElementsByTagName('p') で取得した結果の <code>.length</code> がタグの個数だよ！</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問題4-4の構成 -->
+        <p id="ren4-4"></p>
+        <p><span class="bold">4-4. テキストボックスで指定したタグの数を表示する</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="bold3">手順.<br>
+              テキストボックスからタグ名を取得し、getElementsByTagName() の引数にその変数を直接渡して、取得件数を alert() で表示する。</p>
+            <div class="summary">
+              <p>【問題】</p>
+              <p>上を改良し、テキストボックスからタグ名を入力し、そのタグの数を<code>alert()</code>で表示するプログラムを作成しなさい。ボタンをクリックすると実行されるようにすること。<br>
+              ※ <code>getElementsByTagName()</code>の中にはテキストボックスから取得した変数を直接書けばよい。</p>
+              <p>【サンプルコード（ヒント）】</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function countTag() {
+  // テキストボックスからタグ名を取得する
+  var tagName = document.getElementById('________________').value;
+  // 取得したタグ名で要素を全て取得する
+  var elems = document.getElementsByTagName(________________);
+  // 個数を alert() で表示する
+  alert(________________);
+}</code></pre>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <p class="bold3">実行結果<br></p>
+            <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 10px; border: 1px solid #ccc;">
+              <input type="text" id="demo44-tagInput" value="p" placeholder="タグ名 (例: p, h1, div)"
+                style="margin-bottom: 8px; padding: 5px; width: 160px;"><br>
+              <input type="button" value="4-4: 指定タグの数を表示" onclick="demoCountTag();"
+                style="margin-bottom: 8px;">
+              <p style="font-size:0.8em; color:#888; margin-top:4px;">※ ページ全体のタグ数を表示します</p>
+              <script>
+                // 4-4: テキストボックスで指定したタグ数をalertで表示する関数
+                function demoCountTag() {
+                  var tagName = document.getElementById('demo44-tagInput').value;
+                  var elems = document.getElementsByTagName(tagName);
+                  alert(tagName + 'タグの数：' + elems.length);
+                }
+              </script>
+            </div>
+          </div>
+        </div>
+        <div class="balloon1 left-to-right" style="margin: 10px 0 12px;">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ヒント：getElementsByTagName(変数) のように、変数を直接引数に渡せるよ！テキストボックスに "div" や "h1" と入力して試してみよう！</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問題4-5の構成 -->
+        <p id="ren4-5"></p>
+        <p><span class="bold">4-5. 時間割表で「重要」「微妙」ボタンにより背景色を変更する</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="bold3">手順.<br>
+              tableタグで時間割を作成し、各科目のtdタグにクラスを付けておく。「重要」ボタンでは重要科目のクラスを、「微妙」ボタンでは微妙科目のクラスを getElementsByClassName() で取得して背景色を変更する。</p>
+            <div class="summary">
+              <p>【問題】</p>
+              <p><code>table</code>タグを使って時間割表を作り、「重要」ボタンをクリックすると落とせない科目名の背景色が<span style="color:red;font-weight:bold;">赤</span>に、「微妙」ボタンをクリックすると落としてもよい科目名の背景色が<span style="color:blue;font-weight:bold;">青</span>になるようにしなさい（科目は適当でよい）。</p>
+              <p>【サンプルコード（ヒント）】</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>&lt;!-- HTML --&gt;
+&lt;td class="important"&gt;必修科目A&lt;/td&gt;
+&lt;td class="mild"&gt;選択科目B&lt;/td&gt;
+
+&lt;!-- JavaScript --&gt;
+function markImportant() {
+  var elems = document.getElementsByClassName('________________');
+  for (var i = 0; i &lt; elems.length; i++) {
+    elems[i].style.backgroundColor = '________________';
+  }
+}
+function markMild() {
+  var elems = document.getElementsByClassName('________________');
+  for (var i = 0; i &lt; elems.length; i++) {
+    elems[i].style.backgroundColor = '________________';
+  }
+}</code></pre>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <p class="bold3">実行結果<br></p>
+            <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 10px; border: 1px solid #ccc;">
+              <input type="button" value="重要" onclick="demoMarkImportant();"
+                style="margin-right: 8px; margin-bottom: 8px; background:#ffe0e0;">
+              <input type="button" value="微妙" onclick="demoMarkMild();"
+                style="margin-right: 8px; margin-bottom: 8px; background:#e0e8ff;">
+              <input type="button" value="リセット" onclick="demoResetTable();"
+                style="margin-bottom: 8px;">
+              <!-- デモ用時間割表 -->
+              <table id="demo45-table" style="border-collapse:collapse; width:100%; margin-top:8px; font-size:0.85em;">
+                <tr>
+                  <th style="border:1px solid #ccc; padding:4px; background:#f0f0f0;">時限</th>
+                  <th style="border:1px solid #ccc; padding:4px; background:#f0f0f0;">月</th>
+                  <th style="border:1px solid #ccc; padding:4px; background:#f0f0f0;">火</th>
+                  <th style="border:1px solid #ccc; padding:4px; background:#f0f0f0;">水</th>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #ccc; padding:4px; text-align:center;">1</td>
+                  <td class="dm-important" style="border:1px solid #ccc; padding:4px; text-align:center;">基礎プログラミング</td>
+                  <td class="dm-mild" style="border:1px solid #ccc; padding:4px; text-align:center;">体育</td>
+                  <td class="dm-important" style="border:1px solid #ccc; padding:4px; text-align:center;">数学</td>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #ccc; padding:4px; text-align:center;">2</td>
+                  <td class="dm-mild" style="border:1px solid #ccc; padding:4px; text-align:center;">英語</td>
+                  <td class="dm-important" style="border:1px solid #ccc; padding:4px; text-align:center;">専門演習</td>
+                  <td class="dm-mild" style="border:1px solid #ccc; padding:4px; text-align:center;">選択科目</td>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #ccc; padding:4px; text-align:center;">3</td>
+                  <td class="dm-important" style="border:1px solid #ccc; padding:4px; text-align:center;">情報理論</td>
+                  <td class="dm-mild" style="border:1px solid #ccc; padding:4px; text-align:center;">自由科目</td>
+                  <td class="dm-important" style="border:1px solid #ccc; padding:4px; text-align:center;">卒業研究</td>
+                </tr>
+              </table>
+              <script>
+                // 4-5: 重要科目（dm-important）の背景色を赤にする関数
+                function demoMarkImportant() {
+                  demoResetTable();
+                  var elems = document.getElementById('demo45-table').getElementsByClassName('dm-important');
+                  for (var i = 0; i < elems.length; i++) {
+                    elems[i].style.backgroundColor = 'red';
+                  }
+                }
+                // 4-5: 微妙科目（dm-mild）の背景色を青にする関数
+                function demoMarkMild() {
+                  demoResetTable();
+                  var elems = document.getElementById('demo45-table').getElementsByClassName('dm-mild');
+                  for (var i = 0; i < elems.length; i++) {
+                    elems[i].style.backgroundColor = 'lightblue';
+                  }
+                }
+                // 4-5: テーブルの背景色を初期化する関数
+                function demoResetTable() {
+                  var elems = document.getElementById('demo45-table').getElementsByTagName('td');
+                  for (var i = 0; i < elems.length; i++) {
+                    elems[i].style.backgroundColor = 'transparent';
+                  }
+                }
+              </script>
+            </div>
+          </div>
+        </div>
+        <div class="balloon1 left-to-right" style="margin: 10px 0 12px;">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ヒント：科目のtdタグに "important" や "mild" などのクラスをあらかじめ付けておいて、ボタンクリック時に getElementsByClassName() でまとめて取得して背景色を変えよう！</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+    <section id="area-2">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="kiroku p-2">
+              <h2 class="record2">推奨環境</h2>
+              <p class="center record3">Google Chrome<br>Microsoft Edge<br>Firefox<br>Safari<br>一応どれもスマホ版でも対応可です</p>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="kiroku overflow-auto p-2">
+              <h2 class="record2">活動記録</h2>
+              <p class="record"><span class="date">11月6日</span> よろしくお願いします！</p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p id="page-top"><a href="#"></a></p>
+    </section>
+    <div class="container">
+      <div class="col-sm-6">
+        <a href="home.html">
+        </a>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <a href="https://www.tcu.ac.jp/"><img class="footermedia" src="img2026/tculogo.jpg" alt="TCU"></a>
+        </div>
+
+        <div class="col-md-4">
+          <a href="https://jigsaw.w3.org/css-validator/">
+            <img class="footermedia" src="https://jigsaw.w3.org/css-validator/images/vcss" alt="正当なCSSです!">
+          </a>
+        </div>
+
+        <div class="col-md-4">
+          <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ja">
+            <img class="footermedia" src="img2026/cml.png" alt="クリエイティブコモンズライセンス">
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+
+
+
+    <small>&copy;2026 Makishi All rights reserved.</small>
+  </footer>
+
+  <script>
+    VANTA.FOG({
+      el: "#fog",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false, minHeight: 200.00,
+      minWidth: 200.00,
+      minHeight: 800.00,
+      midtoneColor: 0xfcc395,
+      lowlightColor: 0x3e28a2,
+      speed: 3.50
+    }) 
+  </script>
+</body>
+
+</html>
