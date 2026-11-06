@@ -128,7 +128,10 @@
           <p>
             次のようなHTMLがあるとき、以下の要件を満たすプログラムを作成しなさい。それぞれボタンがクリックされたら実行されるようにすること（それぞれの問題に一つずつ、ボタンを計2つ作って下さい）。<br>
             4-1. クラス名がcccのPタグについて、背景色をテキストボックスに入力された色に変更するプログラムを作成せよ。<br>
-            4-2. クラス名がaaa, bbbのPタグについて、背景色をテキストボックスに入力された色に変更するプログラムを作成せよ。
+            4-2. クラス名がaaa, bbbのPタグについて、背景色をテキストボックスに入力された色に変更するプログラムを作成せよ。<br>
+            4-3. pタグが複数含まれているページを作り、getElementsByTagName()を使ってpタグの数を数え、その数をalert()で表示するプログラムを作成せよ。<br>
+            4-4. テキストボックスからタグ名を入力し、そのタグの数をalert()で表示するプログラムを作成せよ。<br>
+            4-5. tableタグを使って時間割表を作り、「重要」ボタンで落とせない科目の背景色を赤に、「微妙」ボタンで落としてもよい科目の背景色を青にするプログラムを作成せよ。
           </p>
         </div>
 
@@ -155,23 +158,22 @@
             <div class="summary">
               <p>【問題】</p>
               <p>以下のようなPタグがあるとき、クラス名が<code>ccc</code>の要素について、テキストボックスに入力された色を背景色に設定するプログラムを作成しなさい。</p>
-              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>&lt;p class="aaa"&gt;段落1&lt;/p&gt;
-&lt;p class="bbb"&gt;段落2&lt;/p&gt;
-&lt;p class="ccc"&gt;段落3&lt;/p&gt;
-&lt;p class="aaa bbb"&gt;段落4&lt;/p&gt;
-&lt;p class="bbb ccc"&gt;段落5&lt;/p&gt;
-&lt;p class="aaa bbb ccc"&gt;段落6&lt;/p&gt;</code></pre>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>&lt;p class="aaa"&gt;要素1(aaa)&lt;/p&gt;
+&lt;p class="aaa bbb"&gt;要素2(aaa bbb)&lt;/p&gt;
+&lt;p class="ccc aaa bbb"&gt;要素3(ccc aaa bbb)&lt;/p&gt;
+&lt;p class="aaa ccc bbb"&gt;要素4(aaa ccc bbb)&lt;/p&gt;
+&lt;p class="aaa bbb"&gt;要素5(aaa bbb)&lt;/p&gt;</code></pre>
               <p>【サンプルコード（ヒント）】</p>
-              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function changeCccColor() {
-  // まず全要素の背景色を初期化
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function ccc() {
+  // まず対象の段落の背景色を初期化
   reset();
   // テキストボックスから色を取得
-  var color = document.getElementById('________________').value;
+  let color = document.getElementById('colortext').value;
   // クラス名cccの要素を取得
-  var elems = document.getElementsByClassName('________________');
+  let elems = document.getElementById('demo-p-container').getElementsByClassName('ccc');
   // ループして全要素の背景色を変更
-  for (var i = 0; i &lt; elems.length; i++) {
-    elems[i].style.backgroundColor = ________________;
+  for (let i = 0; i &lt; elems.length; i++) {
+    elems[i].style.backgroundColor = color;
   }
 }</code></pre>
             </div>
@@ -180,52 +182,42 @@
             <p class="bold3">実行結果<br></p>
             <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 10px; border: 1px solid #ccc;">
               <!-- 色入力とボタン（4-1・4-2 共通） -->
-              <input type="text" id="demo_colorInput4" value="yellow" placeholder="色名 (例: red, yellow)"
+              <input type="text" id="colortext" value="red" placeholder="色名 (例: red, yellow)"
                 style="margin-bottom: 8px; padding: 5px; width: 180px;"><br>
-              <input type="button" value="4-1: クラスcccの色変更" onclick="demoChangeCcc();"
+              <input type="button" value="cccの色を変更" onclick="ccc();"
                 style="margin-right: 8px; margin-bottom: 8px;">
-              <!-- デモ用Pタグ群（クラス名はデモ専用のプレフィックスdm-で衝突回避） -->
+              <input type="button" value="aaaとbbbの色を変更" onclick="aaabbb();"
+                style="margin-right: 8px; margin-bottom: 8px;">
+              <input type="button" value="リセット" onclick="reset();" style="margin-bottom: 8px;">
               <div id="demo-p-container" style="margin-top: 10px;">
-                <p class="dm-aaa" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落1：クラス aaa</p>
-                <p class="dm-bbb" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落2：クラス bbb</p>
-                <p class="dm-ccc" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落3：クラス ccc</p>
-                <p class="dm-aaa dm-bbb" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落4：クラス aaa bbb</p>
-                <p class="dm-bbb dm-ccc" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落5：クラス bbb ccc</p>
-                <p class="dm-aaa dm-bbb dm-ccc" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">段落6：クラス aaa bbb ccc</p>
+                <p class="aaa" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">要素1(aaa)</p>
+                <p class="aaa bbb" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">要素2(aaa bbb)</p>
+                <p class="ccc aaa bbb" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">要素3(ccc aaa bbb)</p>
+                <p class="aaa ccc bbb" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">要素4(aaa ccc bbb)</p>
+                <p class="aaa bbb" style="padding:6px; border:1px solid #ddd; margin:4px 0; background:transparent;">要素5(aaa bbb)</p>
               </div>
               <script>
-                // 全Pタグの背景色を初期状態(transparent)に戻す関数
-                function demoReset() {
-                  var ps = document.querySelectorAll('#demo-p-container p');
-                  for (var i = 0; i < ps.length; i++) {
+                function reset() {
+                  let ps = document.getElementById('demo-p-container').getElementsByTagName('p');
+                  for (let i = 0; i < ps.length; i++) {
                     ps[i].style.backgroundColor = 'transparent';
                   }
                 }
 
-                // 4-1: クラスcccの背景色を変更する関数
-                function demoChangeCcc() {
-                  // まずリセットして初期状態に戻す
-                  demoReset();
-                  // テキストボックスから色を取得する
-                  var color = document.getElementById('demo_colorInput4').value;
-                  // デモ用クラス名「dm-ccc」を持つ要素を全て取得する
-                  var elems = document.getElementById('demo-p-container').getElementsByClassName('dm-ccc');
-                  // ループして全要素の背景色を変更する
-                  for (var i = 0; i < elems.length; i++) {
+                function ccc() {
+                  reset();
+                  let color = document.getElementById('colortext').value;
+                  let elems = document.getElementById('demo-p-container').getElementsByClassName('ccc');
+                  for (let i = 0; i < elems.length; i++) {
                     elems[i].style.backgroundColor = color;
                   }
                 }
 
-                // 4-2: クラスaaaとbbb両方を持つ要素の背景色を変更する関数
-                function demoChangeAaaBbb() {
-                  // まずリセットして初期状態に戻す
-                  demoReset();
-                  // テキストボックスから色を取得する
-                  var color = document.getElementById('demo_colorInput4').value;
-                  // デモ用クラス「dm-aaa」と「dm-bbb」の両方を持つ要素をスペース区切りで指定して取得する
-                  var elems = document.getElementById('demo-p-container').getElementsByClassName('dm-aaa dm-bbb');
-                  // ループして全要素の背景色を変更する
-                  for (var i = 0; i < elems.length; i++) {
+                function aaabbb() {
+                  reset();
+                  let color = document.getElementById('colortext').value;
+                  let elems = document.getElementById('demo-p-container').getElementsByClassName('aaa bbb');
+                  for (let i = 0; i < elems.length; i++) {
                     elems[i].style.backgroundColor = color;
                   }
                 }
@@ -250,34 +242,34 @@
         <div class="row">
           <div class="col-sm-6">
             <p class="bold3">手順.<br>
-              getElementsByClassName('aaa bbb') でクラスaaa・bbb両方を持つ要素を取得する。ボタンクリック時はまず reset() で背景色を初期化してから変更する。</p>
+              getElementsByClassName('aaa bbb') でクラスaaa・bbb両方を持つ要素を取得する。ボタンクリック時はまず reset() で対象の段落の背景色を初期化してから変更する。</p>
             <div class="summary">
               <p>【問題】</p>
               <p>クラス名が<code>aaa</code>かつ<code>bbb</code>のPタグの背景色を変更するプログラムを作成しなさい。</p>
               <ul style="font-size: 0.9em; padding-left: 20px;">
                 <li>複数のクラス名を指定するには、<code>document.getElementsByClassName('aaa bbb')</code>のように、クラス名をスペースで区切って指定します。これで「aaa と bbb の両方を持つ要素」だけが取得されます。</li>
-                <li>ボタンがクリックされた時には最初に背景色を初期状態（透明）に戻す必要があります。<br>
+                <li>ボタンがクリックされた時には最初に対象の段落の背景色を初期状態（透明）に戻します。<br>
                   初期化には <code>.style.backgroundColor = 'transparent'</code> を使います。<br>
                   この処理を <code>reset()</code> という関数として定義しておき、各ボタンのクリック時に最初に呼び出します。</li>
               </ul>
               <p>【サンプルコード（ヒント）】</p>
-              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>// 全要素の背景色を初期化する関数
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>// 対象の段落の背景色を初期化する関数
 function reset() {
-  var allP = document.getElementsByTagName('p');
-  for (var i = 0; i &lt; allP.length; i++) {
+  let allP = document.getElementById('demo-p-container').getElementsByTagName('p');
+  for (let i = 0; i &lt; allP.length; i++) {
     allP[i].style.backgroundColor = 'transparent';
   }
 }
 
-function changeAaaBbbColor() {
-  // まず全要素の背景色を初期化
+function aaabbb() {
+  // まず対象の段落の背景色を初期化
   reset();
   // テキストボックスから色を取得
-  var color = document.getElementById('________________').value;
+  let color = document.getElementById('colortext').value;
   // クラス名aaa と bbb 両方を持つ要素を取得（スペース区切りで指定）
-  var elems = document.getElementsByClassName('________________');
-  for (var i = 0; i &lt; elems.length; i++) {
-    elems[i].style.backgroundColor = ________________;
+  let elems = document.getElementById('demo-p-container').getElementsByClassName('aaa bbb');
+  for (let i = 0; i &lt; elems.length; i++) {
+    elems[i].style.backgroundColor = color;
   }
 }</code></pre>
             </div>
@@ -285,18 +277,13 @@ function changeAaaBbbColor() {
           <div class="col-sm-6">
             <p class="bold3">実行結果<br></p>
             <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 10px; border: 1px solid #ccc;">
-              <!-- ボタン（4-2用）：4-1と同じテキストボックス・Pコンテナを共有 -->
-              <input type="button" value="4-2: クラスaaa, bbbの色変更" onclick="demoChangeAaaBbb();"
-                style="margin-right: 8px; margin-bottom: 8px;">
-              <input type="button" value="リセット" onclick="demoReset();"
-                style="margin-bottom: 8px;">
-              <p style="font-size: 0.85em; color: #666; margin: 4px 0;">※ 上のテキストボックスと段落表示エリアを共用しています</p>
+              <p style="font-size: 0.85em; color: #666; margin: 4px 0;">※ 上のボタン・テキストボックスと段落表示エリアを共用しています</p>
               <!-- 動作の説明 -->
               <div style="margin-top: 8px; padding: 8px; background: #fff8e1; border-left: 3px solid #f9a825; font-size: 0.85em;">
                 <strong>動作確認：</strong><br>
-                ・「4-1」ボタン → クラスcccを持つ段落3・5・6が着色<br>
-                ・「4-2」ボタン → クラスaaa と bbb 両方持つ段落4・6が着色<br>
-                ・どちらのボタンも押す前に demoReset() で初期化される
+                ・「cccの色を変更」→ 要素3・4が着色<br>
+                ・「aaaとbbbの色を変更」→ 要素2・3・4・5が着色<br>
+                ・ボタンを押すたびに reset() で対象段落の色を初期化
               </div>
             </div>
           </div>
@@ -326,16 +313,16 @@ function changeAaaBbbColor() {
               <p>【サンプルコード（ヒント）】</p>
               <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function countP() {
   // pタグを全て取得する
-  var elems = document.getElementsByTagName('________________');
+  let elems = document.getElementsByTagName('p');
   // 個数を alert() で表示する
-  alert(________________);
+  alert('pタグの数：' + elems.length);
 }</code></pre>
             </div>
           </div>
           <div class="col-sm-6">
             <p class="bold3">実行結果<br></p>
             <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 10px; border: 1px solid #ccc;">
-              <input type="button" value="4-3: pタグの数を表示" onclick="demoCountP();"
+              <input type="button" value="このページのPタグの数は？" onclick="countP();"
                 style="margin-bottom: 8px;">
               <!-- デモ用の複数pタグ -->
               <div id="demo43-container" style="margin-top:10px; font-size:0.9em; color:#555;">
@@ -345,11 +332,10 @@ function changeAaaBbbColor() {
                 <p>サンプル段落4</p>
                 <p>サンプル段落5</p>
               </div>
-              <p style="font-size:0.8em; color:#888; margin-top:6px;">※ このエリア内のpタグ数を表示します</p>
+              <p style="font-size:0.8em; color:#888; margin-top:6px;">※ ページ全体のpタグ数を表示します</p>
               <script>
-                // 4-3: デモエリア内のpタグ数をalertで表示する関数
-                function demoCountP() {
-                  var elems = document.getElementById('demo43-container').getElementsByTagName('p');
+                function countP() {
+                  let elems = document.getElementsByTagName('p');
                   alert('pタグの数：' + elems.length);
                 }
               </script>
@@ -379,29 +365,28 @@ function changeAaaBbbColor() {
               <p>上を改良し、テキストボックスからタグ名を入力し、そのタグの数を<code>alert()</code>で表示するプログラムを作成しなさい。ボタンをクリックすると実行されるようにすること。<br>
               ※ <code>getElementsByTagName()</code>の中にはテキストボックスから取得した変数を直接書けばよい。</p>
               <p>【サンプルコード（ヒント）】</p>
-              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function countTag() {
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function countX() {
   // テキストボックスからタグ名を取得する
-  var tagName = document.getElementById('________________').value;
+  let tagName = document.getElementById('a').value;
   // 取得したタグ名で要素を全て取得する
-  var elems = document.getElementsByTagName(________________);
+  let elems = document.getElementsByTagName(tagName);
   // 個数を alert() で表示する
-  alert(________________);
+  alert(tagName + 'タグの数：' + elems.length);
 }</code></pre>
             </div>
           </div>
           <div class="col-sm-6">
             <p class="bold3">実行結果<br></p>
             <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 10px; border: 1px solid #ccc;">
-              <input type="text" id="demo44-tagInput" value="p" placeholder="タグ名 (例: p, h1, div)"
+              <input type="text" id="a" value="h2" placeholder="タグ名 (例: p, h1, div)"
                 style="margin-bottom: 8px; padding: 5px; width: 160px;"><br>
-              <input type="button" value="4-4: 指定タグの数を表示" onclick="demoCountTag();"
+              <input type="button" value="テキストボックスに指定したタグの数は？" onclick="countX();"
                 style="margin-bottom: 8px;">
               <p style="font-size:0.8em; color:#888; margin-top:4px;">※ ページ全体のタグ数を表示します</p>
               <script>
-                // 4-4: テキストボックスで指定したタグ数をalertで表示する関数
-                function demoCountTag() {
-                  var tagName = document.getElementById('demo44-tagInput').value;
-                  var elems = document.getElementsByTagName(tagName);
+                function countX() {
+                  let tagName = document.getElementById('a').value;
+                  let elems = document.getElementsByTagName(tagName);
                   alert(tagName + 'タグの数：' + elems.length);
                 }
               </script>
@@ -436,14 +421,14 @@ function changeAaaBbbColor() {
 
 &lt;!-- JavaScript --&gt;
 function markImportant() {
-  var elems = document.getElementsByClassName('________________');
-  for (var i = 0; i &lt; elems.length; i++) {
+  let elems = document.getElementsByClassName('________________');
+  for (let i = 0; i &lt; elems.length; i++) {
     elems[i].style.backgroundColor = '________________';
   }
 }
 function markMild() {
-  var elems = document.getElementsByClassName('________________');
-  for (var i = 0; i &lt; elems.length; i++) {
+  let elems = document.getElementsByClassName('________________');
+  for (let i = 0; i &lt; elems.length; i++) {
     elems[i].style.backgroundColor = '________________';
   }
 }</code></pre>
@@ -489,23 +474,23 @@ function markMild() {
                 // 4-5: 重要科目（dm-important）の背景色を赤にする関数
                 function demoMarkImportant() {
                   demoResetTable();
-                  var elems = document.getElementById('demo45-table').getElementsByClassName('dm-important');
-                  for (var i = 0; i < elems.length; i++) {
+                  let elems = document.getElementById('demo45-table').getElementsByClassName('dm-important');
+                  for (let i = 0; i < elems.length; i++) {
                     elems[i].style.backgroundColor = 'red';
                   }
                 }
                 // 4-5: 微妙科目（dm-mild）の背景色を青にする関数
                 function demoMarkMild() {
                   demoResetTable();
-                  var elems = document.getElementById('demo45-table').getElementsByClassName('dm-mild');
-                  for (var i = 0; i < elems.length; i++) {
+                  let elems = document.getElementById('demo45-table').getElementsByClassName('dm-mild');
+                  for (let i = 0; i < elems.length; i++) {
                     elems[i].style.backgroundColor = 'lightblue';
                   }
                 }
                 // 4-5: テーブルの背景色を初期化する関数
                 function demoResetTable() {
-                  var elems = document.getElementById('demo45-table').getElementsByTagName('td');
-                  for (var i = 0; i < elems.length; i++) {
+                  let elems = document.getElementById('demo45-table').getElementsByTagName('td');
+                  for (let i = 0; i < elems.length; i++) {
                     elems[i].style.backgroundColor = 'transparent';
                   }
                 }
