@@ -528,29 +528,30 @@ function markMild() {
         <p><span class="bold">練習問題1. モンテカルロ法で円周率を求める</span></p>
         <div class="row">
           <div class="col-sm-6">
-            <p class="bold3">手順.<br>
-              1×1の範囲にランダムな点を100個打ち、x² + y² が1以下となる点の数kから、円周率を4k / 100で求める。</p>
+            <p class="bold3">考え方.<br>
+              1×1の範囲に点を打ち、円の内側に入った割合から円周率を見積もる。必要な変数、条件式、計算式を考えよう。</p>
             <div class="summary">
               <p>【問題】</p>
               <p><a href="https://web.sfc.keio.ac.jp/~maooon/kiso_pro2/montechan1.html" target="_blank" rel="noopener noreferrer">モンテカルロ法で円周率を求めるプログラム</a>を作成しなさい。試行回数Nは100とする。求め方の詳細は<a href="https://web.sfc.keio.ac.jp/~maooon/kiso_pro2/kaisetsu01.pptx" target="_blank" rel="noopener noreferrer">解説スライド</a>を参照。</p>
+              <p>【考えてみよう】空欄を埋めながら、処理の流れを組み立てなさい。</p>
               <ol>
-                <li>円の中に入った点の数kを0にする。</li>
-                <li><code>Math.random()</code>で0以上1未満のxとyを生成する。</li>
-                <li><code>x * x + y * y &lt;= 1</code>なら、kに1を加える。</li>
-                <li>2・3を100回繰り返す。</li>
-                <li><code>4 * k / 100</code>を円周率の近似値として表示する。</li>
+                <li>円の中に入った点の数を記録する変数kの初期値は？</li>
+                <li>xとyに、0以上1未満の乱数を代入するには？</li>
+                <li>点が1/4円の内側にあるか、どの条件式で判定できる？</li>
+                <li>点を打つ処理を100回繰り返すfor文を書こう。</li>
+                <li>kと試行回数から、円周率の近似値をどう計算する？</li>
               </ol>
               <p>【サンプルコード（ヒント）】</p>
-              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>let n = 100;
-let k = 0;
-for (let i = 0; i &lt; n; i++) {
-  let x = Math.random();
-  let y = Math.random();
-  if (x * x + y * y &lt;= 1) {
-    k++;
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>let n = ____;
+let k = ____;
+for (let i = ____; i &lt; ____; i____) {
+  let x = ____;
+  let y = ____;
+  if (____________________) {
+    ____;
   }
 }
-let pi = 4 * k / n;</code></pre>
+let pi = ____________________;</code></pre>
             </div>
           </div>
           <div class="col-sm-6">
@@ -567,16 +568,22 @@ let pi = 4 * k / n;</code></pre>
         <p><span class="bold">練習問題2. 試行回数を入力できるようにする</span></p>
         <div class="row">
           <div class="col-sm-6">
-            <p class="bold3">手順.<br>
-              練習問題6-1を改良し、試行回数Nをテキストボックスから受け取って円周率を計算する。</p>
+            <p class="bold3">考え方.<br>
+              練習問題1を改良し、入力値の取得・妥当性確認・試行・結果表示を追加する。</p>
             <div class="summary">
               <p>【問題】</p>
               <p>練習問題6-1のプログラムを改良し、試行回数をプロンプトまたはテキストボックスから入力できるようにしなさい。入力値は1以上の整数とする。</p>
               <p>【サンプルコード（ヒント）】</p>
-              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>let n = Number(document.getElementById('trialCount').value);
-if (Number.isSafeInteger(n) &amp;&amp; n &gt; 0) {
-  // n回試行してkを数える
-  let pi = 4 * k / n;
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>let n = ____________________;
+if (____________________________) {
+  let k = ____;
+  for (let i = ____; i &lt; ____; i____) {
+    // 練習問題1と同じ手順で点を打ち、円の内側の点を数える
+  }
+  let pi = ____________________;
+  // 結果を画面に表示する
+} else {
+  // 1以上の整数を入力するよう案内する
 }</code></pre>
             </div>
           </div>
