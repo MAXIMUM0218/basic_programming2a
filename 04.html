@@ -172,10 +172,10 @@
   // テキストボックスから色を取得
   let color = document.getElementById('colortext').value;
   // クラス名cccの要素を取得
-  let elems = document.getElementById('demo-p-container').getElementsByClassName('ccc');
+  let elems = /*   demo-p-container内から、cccクラスを持つ要素を取得 */;
   // ループして全要素の背景色を変更
   for (let i = 0; i &lt; elems.length; i++) {
-    elems[i].style.backgroundColor = color;
+    elems[i].style.backgroundColor = /*   テキストボックスから取得した色 */;
   }
 }</code></pre>
             </div>
@@ -257,9 +257,9 @@
               <p>【サンプルコード（ヒント）】</p>
               <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>// 対象の段落の背景色を初期化する関数
 function reset() {
-  let allP = document.getElementById('demo-p-container').getElementsByTagName('p');
+  let allP = /*   demo-p-container内のp要素をすべて取得 */;
   for (let i = 0; i &lt; allP.length; i++) {
-    allP[i].style.backgroundColor = 'transparent';
+    allP[i].style.backgroundColor = /*   背景色を初期状態に戻す値 */;
   }
 }
 
@@ -269,9 +269,9 @@ function aaabbb() {
   // テキストボックスから色を取得
   let color = document.getElementById('colortext').value;
   // クラス名aaa と bbb 両方を持つ要素を取得（スペース区切りで指定）
-  let elems = document.getElementById('demo-p-container').getElementsByClassName('aaa bbb');
+  let elems = /*   demo-p-container内から、aaaとbbb両方を持つ要素を取得 */;
   for (let i = 0; i &lt; elems.length; i++) {
-    elems[i].style.backgroundColor = color;
+    elems[i].style.backgroundColor = /*   テキストボックスから取得した色 */;
   }
 }</code></pre>
             </div>
@@ -315,9 +315,9 @@ function aaabbb() {
               <p>【サンプルコード（ヒント）】</p>
               <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function countP() {
   // pタグを全て取得する
-  let elems = document.getElementsByTagName('p');
+  let elems = /*   ページ内のpタグをすべて取得 */;
   // 個数を alert() で表示する
-  alert('pタグの数：' + elems.length);
+  alert(/*   取得した要素数を表示する */);
 }</code></pre>
             </div>
           </div>
@@ -371,9 +371,9 @@ function aaabbb() {
   // テキストボックスからタグ名を取得する
   let tagName = document.getElementById('a').value;
   // 取得したタグ名で要素を全て取得する
-  let elems = document.getElementsByTagName(tagName);
+  let elems = /*   入力されたタグ名を使って要素をすべて取得 */;
   // 個数を alert() で表示する
-  alert(tagName + 'タグの数：' + elems.length);
+  alert(/*   タグ名と取得した要素数を組み合わせて表示 */);
 }</code></pre>
             </div>
           </div>
@@ -423,15 +423,15 @@ function aaabbb() {
 
 &lt;!-- JavaScript --&gt;
 function markImportant() {
-  let elems = document.getElementsByClassName('________________');
+  let elems = /*   importantクラスを持つ要素を取得 */;
   for (let i = 0; i &lt; elems.length; i++) {
-    elems[i].style.backgroundColor = '________________';
+    elems[i].style.backgroundColor = /*   重要科目に指定する色 */;
   }
 }
 function markMild() {
-  let elems = document.getElementsByClassName('________________');
+  let elems = /*   mildクラスを持つ要素を取得 */;
   for (let i = 0; i &lt; elems.length; i++) {
-    elems[i].style.backgroundColor = '________________';
+    elems[i].style.backgroundColor = /*   微妙な科目に指定する色 */;
   }
 }</code></pre>
             </div>
@@ -542,16 +542,16 @@ function markMild() {
                 <li>kと試行回数から、円周率の近似値をどう計算する？</li>
               </ol>
               <p>【サンプルコード（ヒント）】</p>
-              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>let n = ____;
-let k = ____;
-for (let i = ____; i &lt; ____; i____) {
-  let x = ____;
-  let y = ____;
-  if (____________________) {
-    ____;
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>let n = /*   問題で指定された試行回数 */;
+let k = /*   円の内側に入った点を数える変数の初期値 */;
+for (let i = /*   繰り返しの開始位置 */; i &lt; /*   何回試行するか */; /*   1回ごとの更新 */) {
+  let x = /*   0以上1未満の乱数を作る */;
+  let y = /*   xとは別に、もう1つ乱数を作る */;
+  if (/*   xとyから、点が1/4円の中か判定する */) {
+    /*   円の内側に入った点の数を1増やす */;
   }
 }
-let pi = ____________________;</code></pre>
+let pi = /*   内側の点の割合から円周率を求める */;</code></pre>
             </div>
           </div>
           <div class="col-sm-6">
@@ -574,16 +574,16 @@ let pi = ____________________;</code></pre>
               <p>【問題】</p>
               <p>練習問題6-1のプログラムを改良し、試行回数をプロンプトまたはテキストボックスから入力できるようにしなさい。入力値は1以上の整数とする。</p>
               <p>【サンプルコード（ヒント）】</p>
-              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>let n = ____________________;
-if (____________________________) {
-  let k = ____;
-  for (let i = ____; i &lt; ____; i____) {
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>let n = /*   入力欄の値を数値として読み取る */;
+if (/*   1以上の整数で、設定した上限以下か確認する */) {
+  let k = /*   内側の点を数える変数の初期値 */;
+  for (let i = /*   繰り返しの開始位置 */; i &lt; /*   入力された試行回数 */; /*   1回ごとの更新 */) {
     // 練習問題1と同じ手順で点を打ち、円の内側の点を数える
   }
-  let pi = ____________________;
-  // 結果を画面に表示する
+  let pi = /*   内側の点の割合から円周率を求める */;
+  //   結果を表示する要素を取得し、textContentを書き換える
 } else {
-  // 1以上の整数を入力するよう案内する
+  //   入力欄の近くに、正しい範囲を案内するメッセージを表示する
 }</code></pre>
             </div>
           </div>
