@@ -66,7 +66,7 @@
             </div>
             <h2 class="text-2xl font-bold text-gray-800 mb-2">早押し脳トレ</h2>
             <div class="text-sm text-gray-600 text-center mb-8 leading-relaxed">
-                <p class="mb-2">全7問の4択クイズです。</p>
+                <p class="mb-2">全11問の4択クイズです。</p>
                 <p class="mb-2">問題は<strong class="text-greenline">1文字ずつ表示</strong>され、<br>文節の区切りで<strong class="text-greenline">少し止まります</strong>。</p>
                 <p>1問15秒。早く正解するほど高スコア！<br>スコアランクに応じて報酬がもらえます。</p>
             </div>
@@ -79,7 +79,7 @@
         <main id="screen-game" class="screen flex-1 flex-col p-5 bg-white relative overflow-y-auto">
             <!-- ステータスバー -->
             <div class="flex justify-between items-end mb-2 shrink-0">
-                <span id="q-counter" class="text-sm font-bold text-gray-500">Q. 1 / 7</span>
+                <span id="q-counter" class="text-sm font-bold text-gray-500">Q. 1 / 11</span>
                 <span class="text-sm font-bold text-greenline">スコア: <span id="current-score">0</span></span>
             </div>
             
@@ -195,6 +195,30 @@
                 correct: "堺雅人",
                 dummies: ["阿部寛", "香川照之", "役所広司"],
                 explanation: "数々の大ヒットドラマで主演を務める実力派俳優です。"
+            },
+            {
+                phrases: ["虫の羽が4枚あることを意味する", "「八重羽(やへば)」が", "訛ったという説がある、", "体長6センチメートル以上の", "トンボを指して使われることが多い、", "トンボの別名は何でしょう？"],
+                correct: "ヤンマ",
+                dummies: ["アキアカネ", "イトトンボ", "カゲロウ"],
+                explanation: "「八重羽（やへば）」が訛って「ヤンマ」になったとされています。一般に大型のトンボを指して使われます。"
+            },
+            {
+                phrases: ["日本の本州を", "青森県から山口県まで", "陸路で移動する際、", "唯一必ず", "通らなければいけない", "都道府県はどこでしょう？"],
+                correct: "兵庫県",
+                dummies: ["京都府", "大阪府", "滋賀県"],
+                explanation: "兵庫県は本州で唯一、日本海と瀬戸内海（太平洋側）の両方に面しているため、陸路で本州を東西に移動する際は必ず通過します。"
+            },
+            {
+                phrases: ["風花、", "青女、", "白魔といえば、", "すべてどのような", "天気を指す", "日本語でしょう？"],
+                correct: "雪",
+                dummies: ["雨", "風", "霧"],
+                explanation: "風花（かざはな）は晴天時に舞う雪、青女（せいじょ）は雪の女神、白魔（はくま）は猛吹雪など、すべて「雪」にまつわる言葉です。"
+            },
+            {
+                phrases: ["英語の「sleep」と", "音が近いため、", "よく快眠の", "おまじないで数えられる", "動物といえば何でしょう？"],
+                correct: "羊",
+                dummies: ["牛", "馬", "山羊"],
+                explanation: "英語で「羊」を意味する「sheep」が「眠る」の「sleep」と発音が似ていることから、羊を数える習慣が広まったとされています。"
             }
         ];
 
@@ -455,7 +479,7 @@
             }
 
             // 報酬ランク判定
-            // 最大得点: 1問1000pt × 7問 = 7000pt (multiplier=1の場合)
+            // 最大得点: 1問1000pt × 問題数 (multiplier=1の場合)
             const maxScore = questions.length * 1000 * multiplier;
             
             const thresholdS = maxScore * 0.85; // 85%以上
