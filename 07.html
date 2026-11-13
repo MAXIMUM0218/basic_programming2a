@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>第7回</title>
+  <meta name="description" content="第7回 Canvasプログラミング教材">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="icon" href="img2026/favicon.ico">
+  <link rel="stylesheet" type="text/css" href="css2026/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css2026/common.css">
+  <link rel="stylesheet" type="text/css" href="site.css">
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="js2026/home.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
+</head>
+
+<body class="">
+  <header id="header" class="DownMove">
+    <div class="logo">
+      <img src="img2026/logo.png" alt="ロゴ">
+    </div>
+    <nav class="onlypc">
+      <ul id="g-navi">
+        <li><a href="07.html">第7回</a></li>
+      </ul>
+    </nav>
+
+    <div class="toggle-btn">
+      <span class="toggle-btn__line toggle-btn__line--top"></span>
+      <span class="toggle-btn__line toggle-btn__line--center"></span>
+      <span class="toggle-btn__line toggle-btn__line--bottom"></span>
+    </div>
+
+    <nav class="global-nav">
+      <div class="global-all">
+        <div class="global-nav__inner">
+          <div class="accordion">
+            <p class="switch2"><a href="07.html">第7回</a></p>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div id="splash" class="sp">
+    <div id="splash_logo" class="sp">
+      <img src="img2026/information.png" alt="河野" class="fadeUp">
+      <img src="img2026/education.png" alt="真喜巳" class="fadeUp">
+    </div>
+  </div>
+  <div id="display" class="sp">
+    <div id="display_logo" class="sp">
+      <p class="text"><strong><img src="img2026/hello.png" alt="インデュケーション"></strong></p>
+    </div>
+  </div>
+
+  <div id="fog" class="op">
+    <div class="global">
+      <p class="conversation2 op">基礎プロ2a</p>
+      <p class="conversation3 op">7週目です。</p>
+    </div>
+  </div>
+
+  <main class="top">
+    <div class="css-scroll-down" style="margin-top: -300px;">
+      <div class="single-scroll-down-animation animation4">
+        <h4>scroll down</h4>
+        <div class="scroll-down4"></div>
+      </div>
+    </div>
+    <section id="area-1">
+      <div class="container">
+
+        <p class="letter conversation">第7回</p>
+
+        <div class="toc">
+          <ul>
+            <li class="summarytext">・<a href="#canvas-basics">Canvasのキホン（初めての方向け）</a></li>
+            <li class="summarytext">・<a href="#ren7-1">練習問題7-1（正N角形の描画）</a></li>
+            <li class="summarytext">・<a href="#ren7-2">練習問題7-2（図形1🏁 市松模様）</a></li>
+            <li class="summarytext">・<a href="#ren7-3">練習問題7-3（図形2 斜線パターン）</a></li>
+            <li class="summarytext">・<a href="#ren7-4">練習問題7-4（図形3 3色の縞模様）</a></li>
+          </ul>
+        </div>
+
+        <div class="balloon1 left-to-right">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>みんなこんにちは！</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="balloon1 left-to-right">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>今回はHTML5の<strong>Canvas（キャンバス）</strong>を使って、JavaScriptで図形を描画する方法を学ぶよ！<br>
+                Canvasを使うと、Webページ上に線や多角形、美しい幾何学模様などを自由に描くことができるんだ。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="balloon1 left-to-right">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ということで、以下が今回の課題だよ～！<br>
+                難しそうに見えても、数学の式や繰り返しの入れ子（2重ループ）の基本がわかればカンタンに描けるよ！
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 全体の課題一覧 -->
+        <div class="problem-list" style="background:#f9f9f9; padding:20px; border-radius:10px; margin-bottom: 20px;">
+          <h3 style="border-bottom: 2px solid #333; padding-bottom: 5px;">本日の課題一覧</h3>
+          <ol style="margin-top: 10px; line-height: 1.8;">
+            <li><a href="./hexagon.html"
+                target="_blank">正六角形を描画するプログラム</a>を改良し、正N角形を描画するプログラムを作成しなさい。Nはテキストボックスから入力するものとする。（<a
+                href="#ren7-1">解説へ</a>）</li>
+            <li>スライドをよく読み、<a href="https://web.sfc.keio.ac.jp/~maooon/kiso_pro2/ex7" target="_blank"
+                rel="noopener noreferrer">図形1🏁</a>を描画するプログラムを作成しなさい。繰り返しの入れ子を使うこと(以下2問同様)。（<a href="#ren7-2">解説へ</a>）
+            </li>
+            <li><a href="https://web.sfc.keio.ac.jp/~maooon/kiso_pro2/ex7" target="_blank"
+                rel="noopener noreferrer">図形2</a>のような図形を描いてみましょう。（<a href="#ren7-3">解説へ</a>）</li>
+            <li><a href="https://web.sfc.keio.ac.jp/~maooon/kiso_pro2/ex7" target="_blank"
+                rel="noopener noreferrer">図形3</a>のような図形を描いてみましょう。（<a href="#ren7-4">解説へ</a>）</li>
+          </ol>
+        </div>
+
+        <!-- 初めての方向け Canvasのキホン解説ブロック -->
+        <p id="canvas-basics"></p>
+        <div
+          style="background:#e8f4fd; border:2px solid #2196f3; border-radius:10px; padding:20px; margin-bottom: 25px;">
+          <h4 style="color:#0d47a1; margin-top:0; font-weight:bold; font-size:1.15em;">💡 はじめてのCanvas！基本のキホン（まずはここからスタートしよう！）</h4>
+          <ul style="font-size:0.95em; line-height:1.9; margin-bottom:0; padding-left:22px;">
+            <li><strong>キャンバス（お絵かきシート）を用意しよう！</strong><br>
+              HTMLに <code>&lt;canvas id="canvas" width="200" height="200"&gt;&lt;/canvas&gt;</code> と書いて、描画する領域を作ろう！幅（width）と高さ（height）をタグの中でしっかり指定するのがポイントだよ。</li>
+            <li><strong>描画ペン（コンテキスト）を取り出そう！</strong><br>
+              JavaScriptで <code>let canvas = document.getElementById('canvas');</code> で要素を取得して、<code>let ctx = canvas.getContext('2d');</code> で2D描画用のペン（コンテキスト）を取り出そう！これ以降の描画はすべてこの <code>ctx</code> を使って行うよ。</li>
+            <li><strong>Canvasの座標（向き）を覚えよう！</strong><br>
+              数学のグラフと違って、Canvasは<strong>「左上が原点 (0, 0)」</strong>だよ！右に進むほど <code>X</code> が大きくなり、下に進むほど <code>Y</code> が大きくなるよ。</li>
+            <li><strong>四角形をサクッと塗りつぶそう！</strong><br>
+              色を <code>ctx.fillStyle = 'black';</code> のように指定して、<code>ctx.fillRect(x, y, 幅, 高さ);</code> を実行するだけで四角形が塗れるよ！（今回の図形1〜3はコレを使うよ！）</li>
+            <li><strong>パスを使って線や多角形を描こう！</strong><br>
+              <code>ctx.beginPath();</code>（描き始め）&rarr; <code>ctx.moveTo(x, y);</code>（始点へ移動）&rarr; <code>ctx.lineTo(x, y);</code>（線を引く）&rarr; <code>ctx.closePath();</code>（閉じる）&rarr; <code>ctx.stroke();</code>（枠線を描く）や <code>ctx.fill();</code>（塗りつぶす）の順に進めよう！（正N角形で使うよ！）</li>
+            <li><strong>描き直すときはキレイに消去しよう！</strong><br>
+              新しい図形を描く前に <code>ctx.clearRect(0, 0, canvas.width, canvas.height);</code> を呼ぶと、前回描いた絵を消して真っ白にリセットできるよ！</li>
+          </ul>
+        </div>
+
+        <div class="balloon1 left-to-right">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>それでは、練習問題7-1から解説を始めるよ！<br>
+                まずは六角形を描くコードを改良して、好きな正N角形を描けるようにしてみよう！
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問題7-1の構成 -->
+        <p id="ren7-1"></p>
+        <p><span class="bold">7-1. 正N角形を描画するプログラム</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="bold3">手順.<br>
+              正六角形のプログラムをベースに、入力欄から角数Nを取得する。for文で 1 から N までループして各頂点へ線を結び、正N角形を描画する。</p>
+            <div class="summary">
+              <p>【問題】</p>
+              <p>正六角形を描画するプログラムを改良し、<strong>正N角形を描画するプログラム</strong>を作成しなさい。Nはテキストボックスから入力するものとする。</p>
+              <p>【考え方・ポイント】</p>
+              <ul style="font-size: 0.9em; padding-left: 20px;">
+                <li><strong>1周の角度をN等分しよう！</strong><br>
+                  円周は360度（2πラジアン）だよ。JavaScriptでは <code>2 * Math.PI</code> と書くので、1周をN等分した角度 <code>(2 * Math.PI / n)</code> ずつ進めながら頂点を計算しよう！</li>
+                <li><strong>三角関数で頂点の座標を計算しよう！</strong><br>
+                  中心座標を <code>(x, y)</code>、半径を <code>r</code> とすると、i番目の頂点座標は次のように計算できるよ！<br>
+                  X座標: <code>x + Math.sin(i * 2 * Math.PI / n) * r</code><br>
+                  Y座標: <code>y - Math.cos(i * 2 * Math.PI / n) * r</code>
+                </li>
+                <li><strong>for文で各頂点へ線をつなごう！</strong><br>
+                  <code>moveTo</code> で最初の頂点に移動したら、<code>for (let i = 1; i &lt;= n; i++)</code> のループで各頂点へ <code>lineTo</code> で線をつなぎ、最後に <code>closePath</code> で図形を閉じよう！</li>
+                <li><strong>描画する前に画面をクリアしよう！</strong><br>
+                  新しい角数を描く前に <code>ctx.clearRect(0, 0, canvas.width, canvas.height);</code> で前回の図形をきれいに消去しよう！</li>
+              </ul>
+              <p>【サンプルコード（ヒント）】</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function drawPolygon() {
+  let canvas = document.getElementById('canvas71');
+  let ctx = canvas.getContext('2d');
+
+  // 前回の描画をクリアしよう
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // テキストボックスから角数Nを取得しよう
+  let n = /*   テキストボックス polyN の値を数値として取得する */;
+  if (n &lt; 3) {
+    alert("3以上の整数を入力してください");
+    return;
+  }
+
+  let x = 100; // 中心のX座標
+  let y = 100; // 中心のY座標
+  let r = 80;  // 半径
+
+  ctx.lineWidth = 3.0;
+  ctx.strokeStyle = 'black';
+  ctx.fillStyle = 'lightgrey';
+
+  ctx.beginPath();
+  // 最初の頂点へ移動しよう (i = 0)
+  ctx.moveTo(x + Math.sin(0 * 2 * Math.PI / n) * r,
+             y - Math.cos(0 * 2 * Math.PI / n) * r);
+
+  // 1 から n まで繰り返し線をつなごう
+  for (let i = 1; /*   繰り返しの終了条件（iがn以下） */; i++) {
+    ctx.lineTo(/*   i番目のX座標（三角関数で計算） */,
+               /*   i番目のY座標（三角関数で計算） */);
+  }
+
+  ctx.closePath(); // パスを閉じよう
+  ctx.fill();      // 塗りつぶそう
+  ctx.stroke();    // 枠線を引こう
+}</code></pre>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <p class="bold3">実行結果<br></p>
+            <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 15px; border: 1px solid #ccc;">
+              <label for="polyN" style="font-weight:bold;">角数 N（3以上の整数）：</label>
+              <input type="number" id="polyN" value="6" min="3" max="36"
+                style="width: 80px; padding: 4px; margin-bottom: 8px;">
+              <input type="button" value="正N角形を描画！" onclick="drawPolygon();"
+                style="margin-left: 6px; padding: 4px 10px; font-weight:bold;"><br>
+
+              <canvas id="canvas71" width="200" height="200"
+                style="border: 1px solid #999; background: #fff; margin-top: 10px; display:block;"></canvas>
+              <p style="font-size: 0.8em; color: #666; margin-top: 6px;">※ Nに 3(三角形)、5(五角形)、8(八角形) などを入れて試してみよう！</p>
+              <script>
+                function drawPolygon() {
+                  let canvas = document.getElementById('canvas71');
+                  let ctx = canvas.getContext('2d');
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                  let n = Number(document.getElementById('polyN').value);
+                  if (isNaN(n) || n < 3) {
+                    alert("3以上の半角数値を入力してください。");
+                    return;
+                  }
+
+                  let x = 100;
+                  let y = 100;
+                  let r = 80;
+
+                  ctx.lineWidth = 3.0;
+                  ctx.strokeStyle = 'black';
+                  ctx.fillStyle = 'lightgrey';
+
+                  ctx.beginPath();
+                  ctx.moveTo(x + Math.sin(0 * 2 * Math.PI / n) * r, y - Math.cos(0 * 2 * Math.PI / n) * r);
+
+                  for (let i = 1; i <= n; i++) {
+                    ctx.lineTo(x + Math.sin(i * 2 * Math.PI / n) * r, y - Math.cos(i * 2 * Math.PI / n) * r);
+                  }
+
+                  ctx.closePath();
+                  ctx.fill();
+                  ctx.stroke();
+                }
+                // 初期表示
+                window.addEventListener('load', function () {
+                  drawPolygon();
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+        <div class="balloon1 left-to-right" style="margin: 10px 0 12px;">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ヒント：六角形のコードにあった <code>/ 6</code> の部分を変数 <code>/ n</code> に置き換えて、for文の終了条件を <code>i &lt;= n</code>
+                にするだけだよ！Nを大きくすると円に近づいていくのが面白いね！</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問題7-2の構成 -->
+        <p id="ren7-2"></p>
+        <p><span class="bold">7-2. 図形1🏁 市松模様（チェッカーフラッグ）を描画する</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="bold3">手順.<br>
+              繰り返しの入れ子（2重ループ）を使って、10行×10列のマス目を走査する。(行番号 + 列番号) が偶数なら黒、奇数なら白を ctx.fillRect() で塗りつぶす。</p>
+            <div class="summary">
+              <p>【問題】</p>
+              <p>スライドをよく読み、<strong>図形1🏁（市松模様）</strong>を描画するプログラムを作成しなさい。<strong>繰り返しの入れ子（2重ループ）</strong>を使うこと(以下2問同様)。
+              </p>
+              <p>【考え方・ポイント】</p>
+              <ul style="font-size: 0.9em; padding-left: 20px;">
+                <li><strong>マス目のサイズと位置を計算しよう！</strong><br>
+                  キャンバスの大きさは幅200px、高さ200pxだよ。10×10のマスを作るので、1マスの大きさは 200 ÷ 10 = 20px になるよ！行番号を <code>i</code>、列番号を <code>j</code> とすると、各マスの左上座標は <code>(j * 20, i * 20)</code> で表せるよ。</li>
+                <li><strong>繰り返しの入れ子（2重ループ）を作ろう！</strong><br>
+                  外側のループで行（縦方向 i = 0〜9）、内側のループで列（横方向 j = 0〜9）を回して、全100マスを順番に走査しよう！</li>
+                <li><strong>偶数・奇数で色を交互に切り替えよう！</strong><br>
+                  市松模様は<strong>「行番号 + 列番号」が偶数なら黒、奇数なら白</strong>と判定すれば綺麗に交互になるよ！判定式には <code>(i + j) % 2 === 0</code> を使おう！</li>
+                <li><strong>四角形を塗りつぶしてマス目を描こう！</strong><br>
+                  色を設定したら、<code>ctx.fillRect(j * size, i * size, size, size);</code> で1マスずつ塗りつぶそう！</li>
+              </ul>
+              <p>【サンプルコード（ヒント）】</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function drawPattern1() {
+  let canvas = document.getElementById('canvas');
+  let ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let size = 20; // 1マスの幅と高さ
+
+  // 外側のループ：行（縦方向 i = 0〜9）
+  for (let i = 0; i &lt; 10; i++) {
+    // 内側のループ：列（横方向 j = 0〜9）
+    for (let j = 0; j &lt; 10; j++) {
+      // (i + j) が偶数なら黒、奇数なら白にしよう
+      if (/*   (i + j) が偶数かどうかを判定する条件式   */) {
+        ctx.fillStyle = 'black';
+      } else {
+        ctx.fillStyle = 'white';
+      }
+      // マス目を塗りつぶそう
+      /*   ctx.fillRect を使ってマスを描画する   */;
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <p class="bold3">実行結果<br></p>
+            <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 15px; border: 1px solid #ccc;">
+              <input type="button" value="図形1🏁 を描画！" onclick="drawPattern1();"
+                style="padding: 4px 10px; font-weight:bold; margin-bottom: 8px;"><br>
+
+              <canvas id="canvas" width="200" height="200"
+                style="border: 1px solid #999; background: #fff;"></canvas><br>図形1<br>
+              <p style="font-size: 0.8em; color: #666; margin-top: 6px;">※ 10×10マス（各20px×20px）の市松模様です。</p>
+              <script>
+                function drawPattern1() {
+                  let canvas = document.getElementById('canvas');
+                  let ctx = canvas.getContext('2d');
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                  let size = 20;
+                  for (let i = 0; i < 10; i++) {
+                    for (let j = 0; j < 10; j++) {
+                      if ((i + j) % 2 === 0) {
+                        ctx.fillStyle = 'black';
+                      } else {
+                        ctx.fillStyle = 'white';
+                      }
+                      ctx.fillRect(j * size, i * size, size, size);
+                    }
+                  }
+                }
+                window.addEventListener('load', function () {
+                  drawPattern1();
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+        <div class="balloon1 left-to-right" style="margin: 10px 0 12px;">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ヒント：外側のループが行、内側のループが列を表すよ！<code>(i + j) % 2 === 0</code> という条件式を使うと、チェッカーフラッグのように隣り合うマス同士で色が交互に切り替わるんだ！
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問題7-3の構成 -->
+        <p id="ren7-3"></p>
+        <p><span class="bold">7-3. 図形2 斜線ストライプパターンを描画する</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="bold3">手順.<br>
+              2重ループの中で、(行番号 + 列番号) を4で割った余りを判定する。余りが0のマスを黒、それ以外を白にすることで、4マス周期の斜線パターンを描画する。</p>
+            <div class="summary">
+              <p>【問題】</p>
+              <p><strong>図形2</strong>のような、斜め方向に走る縞模様（4マス周期のストライプ）を描くプログラムを作成しなさい。練習問題7-2と同様に繰り返しの入れ子を使うこと。</p>
+              <p>【考え方・ポイント】</p>
+              <ul style="font-size: 0.9em; padding-left: 20px;">
+                <li><strong>右上がりの斜めラインの性質を見つけよう！</strong><br>
+                  図形2を観察すると、右上がりの斜めライン上に黒マスが並んでいるよ！斜め方向のマスは <code>(i + j)</code> を計算すると同じ値になる性質があるよ。</li>
+                <li><strong>4で割った余り（周期性）を活用しよう！</strong><br>
+                  4マスごとに同じ斜線パターンが繰り返されているので、<code>(i + j) % 4</code> を計算しよう！余りが <code>0</code> のマスだけを黒色にし、それ以外のマスを白色にしよう！</li>
+                <li><strong>繰り返しの入れ子で全マスを描こう！</strong><br>
+                  図形1と同様に、行 <code>i</code> と列 <code>j</code> の2重ループを回して描画しよう！</li>
+              </ul>
+              <p>【サンプルコード（ヒント）】</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function drawPattern2() {
+  let canvas = document.getElementById('canvas01');
+  let ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let size = 20;
+
+  for (let i = 0; i &lt; 10; i++) {
+    for (let j = 0; j &lt; 10; j++) {
+      // (i + j) を 4 で割った余りが 0 のとき黒にしよう
+      if (/*   (i + j) を 4 で割った余りが 0 か判定する条件式   */) {
+        ctx.fillStyle = 'black';
+      } else {
+        ctx.fillStyle = 'white';
+      }
+      // マス目を塗りつぶそう
+      /*   ctx.fillRect を使ってマスを描画する   */;
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <p class="bold3">実行結果<br></p>
+            <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 15px; border: 1px solid #ccc;">
+              <input type="button" value="図形2 を描画！" onclick="drawPattern2();"
+                style="padding: 4px 10px; font-weight:bold; margin-bottom: 8px;"><br>
+
+              <canvas id='canvas01' width='200' height='200'
+                style="border: 1px solid #999; background: #fff;"></canvas><br>図形2<br>
+              <p style="font-size: 0.8em; color: #666; margin-top: 6px;">※ 4マス周期で斜めに並ぶストライプ模様です。</p>
+              <script>
+                function drawPattern2() {
+                  let canvas = document.getElementById('canvas01');
+                  let ctx = canvas.getContext('2d');
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                  let size = 20;
+                  for (let i = 0; i < 10; i++) {
+                    for (let j = 0; j < 10; j++) {
+                      if ((i + j) % 4 === 0) {
+                        ctx.fillStyle = 'black';
+                      } else {
+                        ctx.fillStyle = 'white';
+                      }
+                      ctx.fillRect(j * size, i * size, size, size);
+                    }
+                  }
+                }
+                window.addEventListener('load', function () {
+                  drawPattern2();
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+        <div class="balloon1 left-to-right" style="margin: 10px 0 12px;">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ヒント：市松模様の <code>% 2</code> を <code>% 4 === 0</code>
+                に変えるだけで、斜めのストライプ模様に大変身するよ！余りの計算（剰余算）は模様づくりにとっても便利なんだ！</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問題7-4の構成 -->
+        <p id="ren7-4"></p>
+        <p><span class="bold">7-4. 図形3 3色の縞模様を描画する</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="bold3">手順.<br>
+              図形2の考え方を発展させ、4で割った余りに応じて「黒」「灰色」「白」の3色に分岐する。if ... else if ... else を使って多色ストライプを描画する。</p>
+            <div class="summary">
+              <p>【問題】</p>
+              <p><strong>図形3</strong>のような、黒・白・灰色の3色からなる斜めストライプ模様を描くプログラムを作成しなさい。繰り返しの入れ子と条件分岐を活用すること。</p>
+              <p>【考え方・ポイント】</p>
+              <ul style="font-size: 0.9em; padding-left: 20px;">
+                <li><strong>4で割った余りに応じて3色に分岐しよう！</strong><br>
+                  図形3は、図形2のパターンの間に灰色（グレー）が挟まっているよ！周期は同じ4マス周期なので、余り <code>rem = (i + j) % 4</code> の値（0, 1, 2, 3）に応じて3色を切り替えよう！
+                  <ul>
+                    <li>余りが 0 のとき：<strong>黒（black）</strong>にしよう！</li>
+                    <li>余りが 2 のとき：<strong>灰色（lightgray）</strong>にしよう！</li>
+                    <li>余りが 1 または 3 のとき：<strong>白（white）</strong>にしよう！</li>
+                  </ul>
+                </li>
+                <li><strong>if ... else if ... else を使おう！</strong><br>
+                  3通りの色を分岐するために、<code>if (rem === 0) { ... } else if (rem === 2) { ... } else { ... }</code> の構文を使おう！</li>
+                <li><strong>マス目を塗りつぶして描画しよう！</strong><br>
+                  分岐で色が決まったら、<code>ctx.fillRect(j * size, i * size, size, size);</code> で描画しよう！</li>
+              </ul>
+              <p>【サンプルコード（ヒント）】</p>
+              <pre style="background:#f4f4f4; padding:10px; border-radius:5px; font-size:12px;"><code>function drawPattern3() {
+  let canvas = document.getElementById('canvas02');
+  let ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let size = 20;
+
+  for (let i = 0; i &lt; 10; i++) {
+    for (let j = 0; j &lt; 10; j++) {
+      let rem = /*   (i + j) を 4 で割った余りを計算する   */;
+
+      // 余りの値によって3色に分岐しよう
+      if (/*   余りが 0 のとき（黒）   */) {
+        ctx.fillStyle = 'black';
+      } else if (/*   余りが 2 のとき（灰色）   */) {
+        ctx.fillStyle = 'lightgray';
+      } else {
+        ctx.fillStyle = 'white';      // 余り1, 3：白
+      }
+
+      // マス目を塗りつぶそう
+      /*   ctx.fillRect を使ってマスを描画する   */;
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <p class="bold3">実行結果<br></p>
+            <div class="summary" style="margin-bottom: 15px; background: #fff; padding: 15px; border: 1px solid #ccc;">
+              <input type="button" value="図形3 を描画！" onclick="drawPattern3();"
+                style="padding: 4px 10px; font-weight:bold; margin-bottom: 8px;"><br>
+
+              <canvas id='canvas02' width='200' height='200'
+                style="border: 1px solid #999; background: #fff;"></canvas><br>図形3<br>
+              <p style="font-size: 0.8em; color: #666; margin-top: 6px;">※ 黒・白・灰色の3色で構成された斜めストライプ模様です。</p>
+              <script>
+                function drawPattern3() {
+                  let canvas = document.getElementById('canvas02');
+                  let ctx = canvas.getContext('2d');
+                  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                  let size = 20;
+                  for (let i = 0; i < 10; i++) {
+                    for (let j = 0; j < 10; j++) {
+                      let rem = (i + j) % 4;
+                      if (rem === 0) {
+                        ctx.fillStyle = 'black';
+                      } else if (rem === 2) {
+                        ctx.fillStyle = 'lightgray';
+                      } else {
+                        ctx.fillStyle = 'white';
+                      }
+                      ctx.fillRect(j * size, i * size, size, size);
+                    }
+                  }
+                }
+                window.addEventListener('load', function () {
+                  drawPattern3();
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+        <div class="balloon1 left-to-right" style="margin: 10px 0 12px;">
+          <div class="faceicon">
+            <img src="img2026/maxi2.jpg" alt="男性">
+          </div>
+          <div class="chatting">
+            <div class="says">
+              <p>ヒント：余りごとに色を変えることで、カラフルなパターンや複雑なチェック模様も作れるようになるよ！数字を変えて自分だけのオリジナル模様を作ってみるのも楽しいよ！</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="area-2">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="kiroku p-2">
+              <h2 class="record2">推奨環境</h2>
+              <p class="center record3">Google Chrome<br>Microsoft Edge<br>Firefox<br>Safari<br>一応どれもスマホ版でも対応可です</p>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="kiroku overflow-auto p-2">
+              <h2 class="record2">活動記録</h2>
+              <p class="record"><span class="date">11月13日</span> 第7回 Canvas教材を更新しました！</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p id="page-top"><a href="#"></a></p>
+    </section>
+    <div class="container">
+      <div class="col-sm-6">
+        <a href="home.html">
+        </a>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <a href="https://www.tcu.ac.jp/"><img class="footermedia" src="img2026/tculogo.jpg" alt="TCU"></a>
+        </div>
+
+        <div class="col-md-4">
+          <a href="https://jigsaw.w3.org/css-validator/">
+            <img class="footermedia" src="https://jigsaw.w3.org/css-validator/images/vcss" alt="正当なCSSです!">
+          </a>
+        </div>
+
+        <div class="col-md-4">
+          <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ja">
+            <img class="footermedia" src="img2026/cml.png" alt="クリエイティブコモンズライセンス">
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <small>&copy;2026 Makishi All rights reserved.</small>
+  </footer>
+
+  <script>
+    if (typeof VANTA !== 'undefined' && VANTA.FOG) {
+      VANTA.FOG({
+        el: "#fog",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        midtoneColor: 0xfcc395,
+        lowlightColor: 0x3e28a2,
+        speed: 3.50
+      });
+    }
+  </script>
+</body>
+
+</html>
